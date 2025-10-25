@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, memo } from "react"
+import { memo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, Check, Clock, Eye } from "lucide-react"
 
@@ -57,40 +57,33 @@ const ParticipantItem = memo(function ParticipantItem({ participant, isAdmin, on
       </div>
     </div>
   )
+}, (prevProps, nextProps) => {
+  // Comparación personalizada para forzar actualización cuando cambien propiedades relevantes
+  return (
+    prevProps.participant.id === nextProps.participant.id &&
+    prevProps.participant.name === nextProps.participant.name &&
+    prevProps.participant.hasVoted === nextProps.participant.hasVoted &&
+    prevProps.participant.role === nextProps.participant.role &&
+    prevProps.participant.adminMode === nextProps.participant.adminMode &&
+    prevProps.participant.isAdmin === nextProps.participant.isAdmin &&
+    prevProps.isAdmin === nextProps.isAdmin
+  )
 })
 ParticipantItem.displayName = "ParticipantItem"
 
 function ParticipantsList({ userName, participants = [], isAdmin = false, onRemoveParticipant }) {
   // Asegurar que participants sea siempre un array y eliminar duplicados
-  const participantsArray = useMemo(() => {
-    if (!Array.isArray(participants)) return [];
-    
-    // Eliminar duplicados basándose en el ID
-    const uniqueParticipants = [];
-    const seenIds = new Set();
-    
-    for (const participant of participants) {
-      if (participant && participant.id && !seenIds.has(participant.id)) {
-        seenIds.add(participant.id);
-        uniqueParticipants.push(participant);
-      }
-    }
-    
-    return uniqueParticipants;
-  }, [participants]);
+  const participantsArray = Array.isArray(participants) ? participants : [];
   
-  const votingParticipants = useMemo(
-    () => participantsArray.filter((p) => {
-      // Excluir admins en modo facilitador
-      if (p.isAdmin && p.adminMode === "facilitator") return false
-      // Excluir participantes con rol FACILITATOR
-      if (p.role && p.role.toUpperCase() === "FACILITATOR") return false
-      return true
-    }),
-    [participantsArray],
-  )
+  const votingParticipants = participantsArray.filter((p) => {
+    // Excluir admins en modo facilitador
+    if (p.isAdmin && p.adminMode === "facilitator") return false
+    // Excluir participantes con rol FACILITATOR
+    if (p.role && p.role.toUpperCase() === "FACILITATOR") return false
+    return true
+  })
 
-  const votedCount = useMemo(() => votingParticipants.filter((p) => p.hasVoted).length, [votingParticipants])
+  const votedCount = votingParticipants.filter((p) => p.hasVoted).length
 
   return (
     <Card className="bg-card border-border sticky top-4">
@@ -107,7 +100,7 @@ function ParticipantsList({ userName, participants = [], isAdmin = false, onRemo
         <div className="space-y-2">
           {participantsArray.map((participant) => (
             <ParticipantItem
-              key={participant.id}
+              key={`${participant.id}-${participant.role}-${participant.hasVoted}`}
               participant={participant}
               isAdmin={isAdmin}
               onRemove={onRemoveParticipant}
