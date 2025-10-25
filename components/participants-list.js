@@ -1,6 +1,6 @@
 "use client"
 
-import { memo } from "react"
+import { memo, useEffect, useRef, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, Check, Clock, Eye } from "lucide-react"
 
@@ -72,6 +72,24 @@ const ParticipantItem = memo(function ParticipantItem({ participant, isAdmin, on
 ParticipantItem.displayName = "ParticipantItem"
 
 function ParticipantsList({ userName, participants = [], isAdmin = false, onRemoveParticipant }) {
+  // Fuerza re-render cuando cambian profundamente los participantes (aunque no cambie la referencia)
+  const [, force] = useState(0)
+  const lastSnapshotRef = useRef("")
+  useEffect(() => {
+    const id = setInterval(() => {
+      try {
+        const snapshot = JSON.stringify(participants)
+        if (snapshot !== lastSnapshotRef.current) {
+          lastSnapshotRef.current = snapshot
+          force((n) => n + 1)
+        }
+      } catch {
+        // evitar bloquear el intervalo ante errores de serialización
+      }
+    }, 1000) // ajustar si necesitas más/menos frecuencia
+    return () => clearInterval(id)
+  }, [participants])
+
   // Asegurar que participants sea siempre un array y eliminar duplicados
   const participantsArray = Array.isArray(participants) ? participants : [];
   
@@ -100,7 +118,7 @@ function ParticipantsList({ userName, participants = [], isAdmin = false, onRemo
         <div className="space-y-2">
           {participantsArray.map((participant) => (
             <ParticipantItem
-              key={`${participant.id}-${participant.role}-${participant.hasVoted}`}
+              key={`${participant.id}-${participant.role}-${participant.hasVoted}-${participant.adminMode}-${participant.isAdmin}`}
               participant={participant}
               isAdmin={isAdmin}
               onRemove={onRemoveParticipant}
@@ -112,4 +130,4 @@ function ParticipantsList({ userName, participants = [], isAdmin = false, onRemo
   )
 }
 
-export default memo(ParticipantsList)
+export default ParticipantsList

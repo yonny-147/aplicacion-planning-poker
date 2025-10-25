@@ -6,12 +6,21 @@ export async function GET(request, { params }) {
   
   const listenerCount = roomStore.listeners.get(code)?.size || 0
   
-  return NextResponse.json({
-    roomCode: code,
-    activeListeners: listenerCount,
-    allListeners: Array.from(roomStore.listeners.keys()).map(key => ({
-      room: key,
-      count: roomStore.listeners.get(key)?.size || 0
-    }))
-  })
+  return NextResponse.json(
+    {
+      roomCode: code,
+      activeListeners: listenerCount,
+      allListeners: Array.from(roomStore.listeners.keys()).map(key => ({
+        room: key,
+        count: roomStore.listeners.get(key)?.size || 0
+      }))
+    },
+    {
+      headers: {
+        "Cache-Control": "no-store, no-cache, must-revalidate",
+        "CDN-Cache-Control": "no-store",
+        "Vercel-CDN-Cache-Control": "no-store"
+      }
+    }
+  )
 }
