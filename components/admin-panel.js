@@ -4,9 +4,11 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Shield, Users, FileText, Eye, UserCheck, LogOut } from "lucide-react"
+import { useSocket } from "@/lib/socket-context"
 
 export default function AdminPanel({ room, participantId, onSetAdminMode, onDeleteRoom }) {
   const [adminMode, setAdminMode] = useState("participant")
+  const socket = useSocket()
 
   useEffect(() => {
     if (room && participantId) {
@@ -29,6 +31,15 @@ export default function AdminPanel({ room, participantId, onSetAdminMode, onDele
   const handleModeChange = (mode) => {
     setAdminMode(mode)
     onSetAdminMode(mode)
+
+    // Emitir evento al servidor para actualizar en tiempo real
+    if (socket && room) {
+      socket.emit("admin:changeMode", {
+        roomId: room.id,
+        participantId: participantId,
+        adminMode: mode,
+      })
+    }
   }
 
   return (
