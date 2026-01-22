@@ -32,7 +32,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning className={`font-sans ${GeistSans.variable} ${GeistMono.variable} ${_v0_fontVariables}`}>
         {children}
-        <Toaster />
+        <Toaster position='top-center' />
         <Analytics />
       </body>
     </html>

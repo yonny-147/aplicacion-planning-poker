@@ -3,19 +3,18 @@
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 
-import { useToast } from "@/hooks/use-toast"
 import RoomHeader from "@/components/room-header"
 import VotingArea from "@/components/voting-area"
 import ParticipantsList from "@/components/participants-list"
 import StoryManager from "@/components/story-manager"
 import AdminPanel from "@/components/admin-panel"
 import { useRoom } from "@/hooks/use-room"
+import { toast } from "sonner"
 
 
 export default function RoomPage() {
   const params = useParams()
   const router = useRouter()
-  const { toast } = useToast()
   const roomCode = params.code
 
   const [mounted, setMounted] = useState(false)
@@ -72,10 +71,8 @@ export default function RoomPage() {
       localStorage.removeItem(`planning-poker-participant-${roomCode}`)
 
       // Mostrar notificación
-      toast({
-        title: "Eliminado de la sala",
+      toast.error("Eliminado de la sala", {
         description: "Has sido eliminado de la sala por el administrador.",
-        variant: "destructive",
       })
 
       // Redirigir a la página principal después de un breve momento
@@ -140,7 +137,7 @@ export default function RoomPage() {
       // Redirigir a la página principal
       router.push("/")
     } catch (err: any) {
-      toast(err.message || "No se pudo eliminar la sala");
+      toast.error(err.message || "No se pudo eliminar la sala");
     }
   }
 

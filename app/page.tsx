@@ -21,8 +21,8 @@ export default function HomePage() {
 
     const createRoom = async () => {
         if (!createUserName.trim()) {
-            console.log("Error al crear la sala");
-            toast("Por favor ingresa tu nombre");
+
+            toast.error("Por favor ingresa tu nombre");
             return;
         }
 
@@ -47,7 +47,7 @@ export default function HomePage() {
             const data = await response.json();
 
             if (!response.ok) {
-                toast(data.error || "Error al crear la sala");
+                toast.error(data.error || "Error al crear la sala");
                 setIsCreating(false);
                 return;
             }
@@ -64,14 +64,14 @@ export default function HomePage() {
             // Redirigir a la sala
             router.push(`/room/${data.roomCode}`);
         } catch (err) {
-            toast("Error de conexión. Por favor intenta de nuevo.");
+            toast.error("Error de conexión. Por favor intenta de nuevo.");
             setIsCreating(false);
         }
     };
 
     const joinRoom = async () => {
         if (!roomCode.trim()) {
-            toast("Por favor ingresa el código de la sala");
+            toast.error("Por favor ingresa el código de la sala");
             return;
         }
 
@@ -82,13 +82,13 @@ export default function HomePage() {
             const data = await response.json();
 
             if (!data.exists) {
-                toast("La sala no existe o ha sido cerrada");
+                toast.error("La sala no existe o ha sido cerrada");
                 return;
             }
 
             router.push(`/join/${roomCode.toUpperCase()}`);
         } catch (err) {
-            toast("Error al validar la sala. Por favor intenta de nuevo.");
+            toast.error("Error al validar la sala. Por favor intenta de nuevo.");
         }
     };
 
