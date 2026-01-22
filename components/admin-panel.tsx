@@ -5,12 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Shield, Users, FileText, Eye, UserCheck, LogOut } from "lucide-react"
 
-export default function AdminPanel({ room, participantId, onSetAdminMode, onDeleteRoom }) {
+export default function AdminPanel({ room, participantId, onSetAdminMode, onDeleteRoom }: { room: any, participantId: string, onSetAdminMode: (mode: string) => void, onDeleteRoom: () => void }) {
   const [adminMode, setAdminMode] = useState("participant")
 
   useEffect(() => {
     if (room && participantId) {
-      const admin = Array.isArray(room.participants) ? room.participants.find((p) => p.id === participantId && p.isAdmin) : null
+      const admin = Array.isArray(room.participants) ? room.participants.find((p: any) => p.id === participantId && p.isAdmin) : null
       if (admin && admin.adminMode) {
         setAdminMode(admin.adminMode)
       }
@@ -24,9 +24,9 @@ export default function AdminPanel({ room, participantId, onSetAdminMode, onDele
 
   const totalParticipants = participantsArr.length
   const totalStories = storiesArr.length
-  const votedStories = storiesArr.filter((s) => s.voted).length
+  const votedStories = storiesArr.filter((s: any) => s.voted).length
 
-  const handleModeChange = (mode) => {
+  const handleModeChange = (mode: string) => {
     setAdminMode(mode)
     onSetAdminMode(mode)
   }

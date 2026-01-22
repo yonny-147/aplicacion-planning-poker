@@ -9,13 +9,13 @@ import { RotateCcw, Eye } from "lucide-react"
 const FIBONACCI_VALUES = ["0", "1", "2", "3", "4", "5", "8", "13", "?", "coffee"]
 const ROLES_FOR_AVERAGE = ["QA", "DEV"]
 
-function VotingArea({ isAdmin, userName, room, participantId, onVote, onReveal, onReset }) {
-  const [selectedVote, setSelectedVote] = useState(null)
+function VotingArea({ isAdmin, userName, room, participantId, onVote, onReveal, onReset }: { isAdmin: boolean, userName: string, room: any, participantId: string, onVote: (vote: string) => void, onReveal: () => void, onReset: () => void }) {
+  const [selectedVote, setSelectedVote] = useState<string | null>(null)
   const [adminMode, setAdminMode] = useState("participant")
 
   useEffect(() => {
     if (room && participantId) {
-      const participant = Array.isArray(room.participants) ? room.participants.find((p) => p.id === participantId) : null
+      const participant = Array.isArray(room.participants) ? room.participants.find((p: any) => p.id === participantId) : null
       if (participant) {
         setSelectedVote(participant.vote)
         if (participant.isAdmin && participant.adminMode) {
@@ -30,20 +30,20 @@ function VotingArea({ isAdmin, userName, room, participantId, onVote, onReveal, 
 
     const participantsArr = Array.isArray(room.participants) ? room.participants : []
 
-    const numericVotes = participantsArr.reduce((acc, participant) => {
+    const numericVotes = participantsArr.reduce((acc: any[], participant: any) => {
       // Excluir facilitadores (admins o con rol FACILITATOR)
       if (!participant || (participant.isAdmin && participant.adminMode === "facilitator")) {
         return acc
       }
-      
+
       const normalizedRole = typeof participant.role === "string" ? participant.role.trim().toUpperCase() : ""
       if (normalizedRole === "FACILITATOR") {
         return acc
       }
-      
+
       // Si no tiene rol definido pero es admin en modo participante, tratarlo como DEV
       const effectiveRole = normalizedRole || (participant.isAdmin && participant.adminMode !== "facilitator" ? "DEV" : "")
-      
+
       if (!ROLES_FOR_AVERAGE.includes(effectiveRole)) {
         return acc
       }
@@ -59,7 +59,7 @@ function VotingArea({ isAdmin, userName, room, participantId, onVote, onReveal, 
 
     if (numericVotes.length === 0) return null
 
-    const sum = numericVotes.reduce((acc, val) => acc + val, 0)
+    const sum = numericVotes.reduce((acc: number, val: number) => acc + val, 0)
     const avg = sum / numericVotes.length
     return avg.toFixed(1)
   }, [room])
@@ -74,22 +74,22 @@ function VotingArea({ isAdmin, userName, room, participantId, onVote, onReveal, 
     const votesSource = storyVotes.length > 0
       ? storyVotes
       : participantsFallback
-          .filter((participant) => {
-            // Excluir facilitadores
-            if (participant?.isAdmin && participant.adminMode === "facilitator") return false
-            if (participant?.role && participant.role.toUpperCase() === "FACILITATOR") return false
-            return participant?.hasVoted
-          })
-          .map((participant) => {
-            // Si el participante es admin en modo participante sin rol, asignar DEV por defecto
-            let effectiveRole = participant.role || "";
-            if (!effectiveRole && participant.isAdmin && participant.adminMode !== "facilitator") {
-              effectiveRole = "DEV";
-            }
-            return { role: effectiveRole, vote: participant.vote };
-          })
+        .filter((participant: any) => {
+          // Excluir facilitadores
+          if (participant?.isAdmin && participant.adminMode === "facilitator") return false
+          if (participant?.role && participant.role.toUpperCase() === "FACILITATOR") return false
+          return participant?.hasVoted
+        })
+        .map((participant: any) => {
+          // Si el participante es admin en modo participante sin rol, asignar DEV por defecto
+          let effectiveRole = participant.role || "";
+          if (!effectiveRole && participant.isAdmin && participant.adminMode !== "facilitator") {
+            effectiveRole = "DEV";
+          }
+          return { role: effectiveRole, vote: participant.vote };
+        })
 
-    return ROLES_FOR_AVERAGE.reduce((acc, role) => {
+    return ROLES_FOR_AVERAGE.reduce((acc: any, role: string) => {
       const backendValue = result?.[role]
       if (backendValue !== undefined && backendValue !== null && backendValue !== "") {
         const normalizedBackend = Number.parseFloat(backendValue)
@@ -98,12 +98,12 @@ function VotingArea({ isAdmin, userName, room, participantId, onVote, onReveal, 
       }
 
       const roleVotes = votesSource
-        .filter((vote) => typeof vote?.role === "string" && vote.role.trim().toUpperCase() === role)
-        .map((vote) => Number.parseFloat(vote.vote))
-        .filter((value) => !Number.isNaN(value))
+        .filter((vote: any) => typeof vote?.role === "string" && vote.role.trim().toUpperCase() === role)
+        .map((vote: any) => Number.parseFloat(vote.vote))
+        .filter((value: number) => !Number.isNaN(value))
 
       if (roleVotes.length > 0) {
-        const average = roleVotes.reduce((sum, value) => sum + value, 0) / roleVotes.length
+        const average = roleVotes.reduce((sum: number, value: number) => sum + value, 0) / roleVotes.length
         acc[role] = average.toFixed(1)
       }
 
@@ -123,7 +123,7 @@ function VotingArea({ isAdmin, userName, room, participantId, onVote, onReveal, 
   const votingParticipants = useMemo(
     () => {
       const parts = Array.isArray(room?.participants) ? room.participants : []
-      return parts.filter((p) => {
+      return parts.filter((p: any) => {
         // Excluir admins en modo facilitador
         if (p.isAdmin && p.adminMode === "facilitator") return false
         // Excluir participantes con rol FACILITATOR
@@ -135,28 +135,28 @@ function VotingArea({ isAdmin, userName, room, participantId, onVote, onReveal, 
   )
 
   const allVoted = useMemo(
-    () => votingParticipants.length > 0 && votingParticipants.every((p) => p.hasVoted),
+    () => votingParticipants.length > 0 && votingParticipants.every((p: any) => p.hasVoted),
     [votingParticipants],
   )
 
   const isRevealed = room?.isRevealed || false
-  
+
   // Verificar si el usuario actual es facilitador (admin en modo facilitador o con rol FACILITATOR)
   const isFacilitator = useMemo(() => {
     if (isAdmin && adminMode === "facilitator") return true
     if (room && participantId) {
-      const currentParticipant = Array.isArray(room.participants) 
-        ? room.participants.find((p) => p.id === participantId) 
+      const currentParticipant = Array.isArray(room.participants)
+        ? room.participants.find((p: any) => p.id === participantId)
         : null
       if (currentParticipant?.role?.toUpperCase() === "FACILITATOR") return true
     }
     return false
   }, [isAdmin, adminMode, room, participantId])
-  
+
   const currentStory = room?.currentStory
 
-  const handleVote = (value) => {
-    setSelectedVote(value)
+  const handleVote = (value: string) => {
+    setSelectedVote(value!)
     onVote(value)
   }
 
@@ -212,7 +212,7 @@ function VotingArea({ isAdmin, userName, room, participantId, onVote, onReveal, 
                 <div className="mt-6 p-4 bg-muted rounded-lg">
                   <h4 className="font-semibold mb-3">Resultados de la votación</h4>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
-                    {votingParticipants.map((participant) => (
+                    {votingParticipants.map((participant: any) => (
                       <div
                         key={participant.id}
                         className="flex items-center justify-between p-3 bg-background rounded-lg"
@@ -226,13 +226,13 @@ function VotingArea({ isAdmin, userName, room, participantId, onVote, onReveal, 
                   </div>
                   {roleAverageEntries.length > 0 && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-                      {roleAverageEntries.map(({ role, value }) => (
+                      {roleAverageEntries.map((entry: any) => (
                         <div
-                          key={role}
+                          key={entry.role}
                           className="flex flex-col items-center justify-center p-4 bg-background rounded-lg border border-border"
                         >
-                          <span className="text-sm font-medium text-muted-foreground">Promedio {role}</span>
-                          <span className="text-2xl font-bold text-foreground">{value}</span>
+                          <span className="text-sm font-medium text-muted-foreground">Promedio {entry.role}</span>
+                          <span className="text-2xl font-bold text-foreground">{entry.value}</span>
                         </div>
                       ))}
                     </div>

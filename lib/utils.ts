@@ -1,11 +1,10 @@
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-export function cn(...inputs) {
+export function cn(...inputs: any[]) {
     return twMerge(clsx(inputs));
 }
 
-// Generate a random room code
 export function generateRoomCode(length = 6) {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let code = "";
@@ -15,12 +14,9 @@ export function generateRoomCode(length = 6) {
     return code;
 }
 
-// Generate a unique participant ID
 export function generateParticipantId() {
     return `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 }
-
-// Validate room code format
-export function isValidRoomCode(code) {
+export function isValidRoomCode(code: string) {
     return /^[A-Z0-9]{4,8}$/.test(code);
 }

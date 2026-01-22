@@ -1,7 +1,7 @@
 "use client"
 
-export default function VotingCard({ value, isSelected, onSelect, isRevealed, isDisabled }) {
-  const getCardDisplay = (val) => {
+export default function VotingCard({ value, isSelected, onSelect, isRevealed, isDisabled }: { value: string, isSelected: boolean, onSelect: (value: string) => void, isRevealed: boolean, isDisabled: boolean }) {
+  const getCardDisplay = (val: string) => {
     if (val === "?") return "?"
     if (val === "coffee") return "☕"
     return val
@@ -17,10 +17,9 @@ export default function VotingCard({ value, isSelected, onSelect, isRevealed, is
         font-bold text-2xl
         hover:scale-105 active:scale-95
         disabled:opacity-50 disabled:cursor-not-allowed
-        ${
-          isSelected
-            ? "bg-primary border-primary text-primary-foreground shadow-lg scale-105"
-            : "bg-card border-border text-foreground hover:border-primary/50 hover:bg-muted"
+        ${isSelected
+          ? "bg-primary border-primary text-primary-foreground shadow-lg scale-105"
+          : "bg-card border-border text-foreground hover:border-primary/50 hover:bg-muted"
         }
       `}
     >

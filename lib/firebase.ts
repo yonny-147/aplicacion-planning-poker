@@ -2,15 +2,12 @@ import admin from "firebase-admin";
 
 const isProd = process.env.NODE_ENV === "production";
 
-// Initialize Firebase Admin SDK
 let app;
 
 try {
-    // Check if already initialized
     app = admin.apps.length ? admin.app() : null;
 
     if (!app) {
-        // Initialize with service account credentials
         const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT
             ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
             : {
@@ -34,10 +31,8 @@ try {
     throw error;
 }
 
-// Get Realtime Database reference
 const db = admin.database();
 
-// Health check for production
 if (isProd) {
     setInterval(async () => {
         try {
@@ -51,14 +46,11 @@ if (isProd) {
         } catch (err) {
             console.error("Error verificando conexión Firebase:", err);
         }
-    }, 300000); // cada 5 minutos
+    }, 300000);
 }
 
-// Export database instance
 export default db;
 
-// Export admin for advanced usage
 export { admin };
 
-// Export prefix for consistency
 export const DB_PREFIX = process.env.FIREBASE_PREFIX || "planning-poker";

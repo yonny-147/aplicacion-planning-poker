@@ -2,13 +2,15 @@
 
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { useRoom } from "@/hooks/use-room"
+
 import { useToast } from "@/hooks/use-toast"
 import RoomHeader from "@/components/room-header"
 import VotingArea from "@/components/voting-area"
 import ParticipantsList from "@/components/participants-list"
 import StoryManager from "@/components/story-manager"
 import AdminPanel from "@/components/admin-panel"
+import { useRoom } from "@/hooks/use-room"
+
 
 export default function RoomPage() {
   const params = useParams()
@@ -68,14 +70,14 @@ export default function RoomPage() {
       localStorage.removeItem("isAdmin")
       localStorage.removeItem("participantId")
       localStorage.removeItem(`planning-poker-participant-${roomCode}`)
-      
+
       // Mostrar notificación
       toast({
         title: "Eliminado de la sala",
         description: "Has sido eliminado de la sala por el administrador.",
         variant: "destructive",
       })
-      
+
       // Redirigir a la página principal después de un breve momento
       setTimeout(() => {
         router.push("/")
@@ -108,7 +110,7 @@ export default function RoomPage() {
   }
 
   // Función para eliminar participante
-  const handleRemoveParticipant = async (participantIdToRemove) => {
+  const handleRemoveParticipant = async (participantIdToRemove: string) => {
     if (!participantIdToRemove || !participantId) return
     try {
       await fetch(`/api/rooms/${roomCode}/participants/${participantIdToRemove}/delete`, {
@@ -129,34 +131,26 @@ export default function RoomPage() {
 
     try {
       await deleteRoomAndExit()
-      
+
       // Limpiar localStorage
       localStorage.removeItem("userName")
       localStorage.removeItem("isAdmin")
-      
-      toast({
-        title: "Sala eliminada",
-        description: "La sala ha sido eliminada exitosamente.",
-      })
-      
+
+
       // Redirigir a la página principal
       router.push("/")
-    } catch (err) {
-      toast({
-        title: "Error",
-        description: err.message || "No se pudo eliminar la sala",
-        variant: "destructive",
-      })
+    } catch (err: any) {
+      toast(err.message || "No se pudo eliminar la sala");
     }
   }
 
   return (
     <div className="min-h-screen bg-background">
-      <RoomHeader 
-        roomCode={roomCode} 
-        userName={userName} 
-        isAdmin={isAdmin} 
-        currentRole={room?.participants?.find(p => p.id === participantId)?.role || ""}
+      <RoomHeader
+        roomCode={roomCode as string}
+        userName={userName}
+        isAdmin={isAdmin}
+        currentRole={room?.participants?.find((p: any) => p.id === participantId)?.role || ""}
         onChangeRole={changeRole}
       />
 
@@ -167,7 +161,7 @@ export default function RoomPage() {
               isAdmin={isAdmin}
               userName={userName}
               room={room}
-              participantId={participantId}
+              participantId={participantId as string}
               onVote={submitVote}
               onReveal={revealVotes}
               onReset={resetVotes}
@@ -184,9 +178,9 @@ export default function RoomPage() {
 
           <div className="lg:col-span-1 space-y-6">
             {isAdmin && (
-              <AdminPanel 
-                room={room} 
-                participantId={participantId} 
+              <AdminPanel
+                room={room}
+                participantId={participantId as string}
                 onSetAdminMode={setAdminMode}
                 onDeleteRoom={handleDeleteRoom}
               />
