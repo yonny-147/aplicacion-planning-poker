@@ -4,29 +4,38 @@
 
 - Node.js (>= 16)
 - pnpm
-- Docker (para Redis)
+- Una cuenta de Firebase (gratuita)
 
 ## Configuración
 
 1. Instala las dependencias:
+
 ```bash
 pnpm install
 ```
 
-2. Configura Redis localmente:
-- Ver instrucciones detalladas en [REDIS.md](REDIS.md)
-- O ejecuta rápidamente:
-```powershell
-docker run --name planning-poker-redis -p 6379:6379 -d redis:alpine
+2. Configura Firebase:
+
+- Ver instrucciones detalladas en [FIREBASE.md](FIREBASE.md)
+- Crea un proyecto en [Firebase Console](https://console.firebase.google.com)
+- Habilita Realtime Database
+- Descarga las credenciales del service account
+
+3. Crea un archivo `.env.local` basado en `.env.example`:
+
+```bash
+cp .env.example .env.local
 ```
 
-3. Crea un archivo `.env.local`:
-```
-REDIS_URL=redis://localhost:6379
-REDIS_PREFIX=planning-poker:
+4. Completa las variables de entorno en `.env.local` con tus credenciales de Firebase.
+
+5. Inicia el servidor de desarrollo:
+
+```bash
+pnpm dev
 ```
 
-*Automatically synced with your [v0.app](https://v0.app) deployments*
+_Automatically synced with your [v0.app](https://v0.app) deployments_
 
 [![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/yonny-alexander-ospinas-projects/v0-aplicacion-planning-poker)
 [![Built with v0](https://img.shields.io/badge/Built%20with-v0.app-black?style=for-the-badge)](https://v0.app/chat/projects/Ln4LIOwxsvq)
