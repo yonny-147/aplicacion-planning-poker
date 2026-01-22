@@ -6,6 +6,10 @@
 - pnpm
 - Una cuenta de Firebase (gratuita)
 
+## Estado Actual
+
+⚠️ **La aplicación está configurada como frontend-only**. Todas las rutas API han sido eliminadas para facilitar la integración directa con Firebase.
+
 ## Configuración
 
 1. Instala las dependencias:
@@ -17,17 +21,25 @@ pnpm install
 2. Configura Firebase:
 
 - Ver instrucciones detalladas en [FIREBASE.md](FIREBASE.md)
-- Crea un proyecto en [Firebase Console](https://console.firebase.google.com)
-- Habilita Realtime Database
-- Descarga las credenciales del service account
+- Para integración frontend, ver [FRONTEND_SETUP.md](FRONTEND_SETUP.md)
 
-3. Crea un archivo `.env.local` basado en `.env.example`:
+3. **Opción A - Firebase Client SDK (Recomendado):**
 
 ```bash
-cp .env.example .env.local
+pnpm add firebase
 ```
 
-4. Completa las variables de entorno en `.env.local` con tus credenciales de Firebase.
+Crea `.env.local`:
+
+```env
+NEXT_PUBLIC_FIREBASE_API_KEY=tu-api-key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=tu-project.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_DATABASE_URL=https://tu-project-default-rtdb.firebaseio.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=tu-project-id
+```
+
+4. **Opción B - Firebase Admin SDK:**
+   Ver [FIREBASE.md](FIREBASE.md) para configuración completa.
 
 5. Inicia el servidor de desarrollo:
 
@@ -35,31 +47,24 @@ cp .env.example .env.local
 pnpm dev
 ```
 
+## Próximos Pasos
+
+Lee [FRONTEND_SETUP.md](FRONTEND_SETUP.md) para:
+
+- Opciones de integración con Firebase
+- Estructura de datos recomendada
+- Ejemplos de código
+- Guía de implementación
+
+## Documentación
+
+- [FIREBASE.md](FIREBASE.md) - Setup de Firebase
+- [FRONTEND_SETUP.md](FRONTEND_SETUP.md) - Integración frontend
+- [MIGRATION_SUMMARY.md](MIGRATION_SUMMARY.md) - Historial de cambios
+
+---
+
 _Automatically synced with your [v0.app](https://v0.app) deployments_
 
 [![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/yonny-alexander-ospinas-projects/v0-aplicacion-planning-poker)
 [![Built with v0](https://img.shields.io/badge/Built%20with-v0.app-black?style=for-the-badge)](https://v0.app/chat/projects/Ln4LIOwxsvq)
-
-## Overview
-
-This repository will stay in sync with your deployed chats on [v0.app](https://v0.app).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.app](https://v0.app).
-
-## Deployment
-
-Your project is live at:
-
-**[https://vercel.com/yonny-alexander-ospinas-projects/v0-aplicacion-planning-poker](https://vercel.com/yonny-alexander-ospinas-projects/v0-aplicacion-planning-poker)**
-
-## Build your app
-
-Continue building your app on:
-
-**[https://v0.app/chat/projects/Ln4LIOwxsvq](https://v0.app/chat/projects/Ln4LIOwxsvq)**
-
-## How It Works
-
-1. Create and modify your project using [v0.app](https://v0.app)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
