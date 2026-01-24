@@ -28,6 +28,7 @@ export async function POST(request: Request) {
                     isAdmin: true,
                     role: "",
                     vote: null,
+                    hasVoted: false,
                 },
             ],
             stories: [],

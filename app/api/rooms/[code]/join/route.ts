@@ -71,6 +71,7 @@ export async function POST(
                 isAdmin: false,
                 role: role || "",
                 vote: null,
+                hasVoted: false,
             };
 
             updatedParticipants = [...participants, newParticipant];

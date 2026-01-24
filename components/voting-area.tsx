@@ -139,7 +139,7 @@ function VotingArea({ isAdmin, userName, room, participantId, onVote, onReveal, 
     [votingParticipants],
   )
 
-  const isRevealed = room?.isRevealed || false
+  const isRevealed = room?.votesRevealed || false
 
   // Verificar si el usuario actual es facilitador (admin en modo facilitador o con rol FACILITATOR)
   const isFacilitator = useMemo(() => {
@@ -153,7 +153,9 @@ function VotingArea({ isAdmin, userName, room, participantId, onVote, onReveal, 
     return false
   }, [isAdmin, adminMode, room, participantId])
 
-  const currentStory = room?.currentStory
+
+  const currentStory = room?.stories.find((s: any) => s.id === room?.selectedStoryId)
+
 
   const handleVote = (value: string) => {
     setSelectedVote(value!)

@@ -29,7 +29,7 @@ export async function POST(
         // Actualizar el voto del participante
         const participants = roomData.participants || [];
         const updatedParticipants = participants.map((p: any) =>
-            p.id === participantId ? { ...p, vote } : p,
+            p.id === participantId ? { ...p, vote, hasVoted: true } : p,
         );
 
         await roomRef.child("participants").set(updatedParticipants);

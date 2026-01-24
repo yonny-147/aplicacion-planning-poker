@@ -35,6 +35,7 @@ export async function POST(
         const resetParticipants = participants.map((p: any) => ({
             ...p,
             vote: null,
+            hasVoted: false,
         }));
 
         await roomRef.update({
