@@ -23,8 +23,9 @@ export default function AdminPanel({ room, participantId, onSetAdminMode, onDele
   const storiesArr = Array.isArray(room.stories) ? room.stories : []
 
   const totalParticipants = participantsArr.length
-  const totalStories = storiesArr.length
+  const allStories = storiesArr.length
   const votedStories = storiesArr.filter((s: any) => s.voted).length
+  const activeStories = allStories - votedStories
 
   const handleModeChange = (mode: string) => {
     setAdminMode(mode)
@@ -90,10 +91,13 @@ export default function AdminPanel({ room, participantId, onSetAdminMode, onDele
             <div className="p-4 bg-muted rounded-lg">
               <div className="flex items-center gap-2 mb-2">
                 <FileText className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">Historias</span>
+                <span className="text-sm text-muted-foreground">Historias Activas</span>
               </div>
               <p className="text-2xl font-bold">
-                {votedStories}/{totalStories}
+                {activeStories}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {votedStories} completadas
               </p>
             </div>
           </div>

@@ -10,6 +10,7 @@ import StoryManager from "@/components/story-manager"
 import AdminPanel from "@/components/admin-panel"
 import { useRoom } from "@/hooks/use-room"
 import { toast } from "sonner"
+import VotedStoriesHistory from "@/components/voted-stories-history"
 
 
 export default function RoomPage() {
@@ -171,6 +172,8 @@ export default function RoomPage() {
               onDeleteStory={deleteStory}
               onSelectStory={selectStory}
             />
+
+            <VotedStoriesHistory room={room} />
           </div>
 
           <div className="lg:col-span-1 space-y-6">

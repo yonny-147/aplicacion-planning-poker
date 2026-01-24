@@ -17,6 +17,18 @@ export interface Story {
     description: string;
     selected?: boolean;
     finalVote?: string;
+    voted?: boolean;
+    result?: {
+        QA?: string;
+        DEV?: string;
+    };
+    votes?: Array<{
+        participantId: string;
+        participantName: string;
+        role: string;
+        vote: string;
+    }>;
+    votedAt?: number;
 }
 
 export interface Room {

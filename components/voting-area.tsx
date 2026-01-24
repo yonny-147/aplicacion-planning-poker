@@ -154,7 +154,7 @@ function VotingArea({ isAdmin, userName, room, participantId, onVote, onReveal, 
   }, [isAdmin, adminMode, room, participantId])
 
 
-  const currentStory = room?.stories.find((s: any) => s.id === room?.selectedStoryId)
+  const currentStory = room?.stories?.find((s: any) => s.id === room?.selectedStoryId) || null
 
 
   const handleVote = (value: string) => {

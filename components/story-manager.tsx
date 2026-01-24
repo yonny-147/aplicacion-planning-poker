@@ -24,8 +24,8 @@ const StoryItem = memo(({ story, currentStoryId, isAdmin, onSelectStory, onDelet
   return (
     <div
       className={`p-3 rounded-lg border-2 transition-all cursor-pointer ${isActive
-          ? "bg-primary/10 border-primary shadow-md"
-          : "bg-muted border-transparent hover:border-border hover:shadow-sm"
+        ? "bg-primary/10 border-primary shadow-md"
+        : "bg-muted border-transparent hover:border-border hover:shadow-sm"
         }`}
       onClick={() => isAdmin && !isActive && onSelectStory(story.id)}
     >
@@ -89,8 +89,12 @@ function StoryManager({ room, isAdmin, onAddStory, onDeleteStory, onSelectStory 
     setIsCreating(false)
   }
 
-  const stories = useMemo(() => room?.stories || [], [room?.stories])
-  const currentStoryId = useMemo(() => room?.currentStory?.id, [room?.currentStory?.id])
+  const stories = useMemo(() => {
+    const allStories = room?.stories || [];
+
+    return allStories.filter((s: any) => !s.voted);
+  }, [room?.stories]);
+  const currentStoryId = useMemo(() => room?.currentStory?.id, [room?.currentStory?.id]);
 
   return (
     <Card className="bg-card border-border">
