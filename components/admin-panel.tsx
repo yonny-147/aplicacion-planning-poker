@@ -5,12 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Shield, Users, FileText, Eye, UserCheck, LogOut } from "lucide-react"
 
-export default function AdminPanel({ room, participantId, onSetAdminMode, onDeleteRoom }) {
+export default function AdminPanel({ room, participantId, onSetAdminMode, onDeleteRoom }: { room: any, participantId: string, onSetAdminMode: (mode: string) => void, onDeleteRoom: () => void }) {
   const [adminMode, setAdminMode] = useState("participant")
 
   useEffect(() => {
     if (room && participantId) {
-      const admin = Array.isArray(room.participants) ? room.participants.find((p) => p.id === participantId && p.isAdmin) : null
+      const admin = Array.isArray(room.participants) ? room.participants.find((p: any) => p.id === participantId && p.isAdmin) : null
       if (admin && admin.adminMode) {
         setAdminMode(admin.adminMode)
       }
@@ -23,10 +23,11 @@ export default function AdminPanel({ room, participantId, onSetAdminMode, onDele
   const storiesArr = Array.isArray(room.stories) ? room.stories : []
 
   const totalParticipants = participantsArr.length
-  const totalStories = storiesArr.length
-  const votedStories = storiesArr.filter((s) => s.voted).length
+  const allStories = storiesArr.length
+  const votedStories = storiesArr.filter((s: any) => s.voted).length
+  const activeStories = allStories - votedStories
 
-  const handleModeChange = (mode) => {
+  const handleModeChange = (mode: string) => {
     setAdminMode(mode)
     onSetAdminMode(mode)
   }
@@ -90,10 +91,13 @@ export default function AdminPanel({ room, participantId, onSetAdminMode, onDele
             <div className="p-4 bg-muted rounded-lg">
               <div className="flex items-center gap-2 mb-2">
                 <FileText className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">Historias</span>
+                <span className="text-sm text-muted-foreground">Historias Activas</span>
               </div>
               <p className="text-2xl font-bold">
-                {votedStories}/{totalStories}
+                {activeStories}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {votedStories} completadas
               </p>
             </div>
           </div>

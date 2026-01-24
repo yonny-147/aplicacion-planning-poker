@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Plus, Trash2, CheckCircle2, ChevronRight } from "lucide-react"
 
-const StoryItem = memo(({ story, currentStoryId, isAdmin, onSelectStory, onDeleteStory }) => {
+const StoryItem = memo(({ story, currentStoryId, isAdmin, onSelectStory, onDeleteStory }: { story: any, currentStoryId: string, isAdmin: boolean, onSelectStory: (id: string) => void, onDeleteStory: (id: string) => void }) => {
   const isActive = story.id === currentStoryId
 
   const renderResult = () => {
@@ -23,11 +23,10 @@ const StoryItem = memo(({ story, currentStoryId, isAdmin, onSelectStory, onDelet
 
   return (
     <div
-      className={`p-3 rounded-lg border-2 transition-all cursor-pointer ${
-        isActive
-          ? "bg-primary/10 border-primary shadow-md"
-          : "bg-muted border-transparent hover:border-border hover:shadow-sm"
-      }`}
+      className={`p-3 rounded-lg border-2 transition-all cursor-pointer ${isActive
+        ? "bg-primary/10 border-primary shadow-md"
+        : "bg-muted border-transparent hover:border-border hover:shadow-sm"
+        }`}
       onClick={() => isAdmin && !isActive && onSelectStory(story.id)}
     >
       <div className="flex items-start justify-between gap-2">
@@ -76,7 +75,7 @@ const StoryItem = memo(({ story, currentStoryId, isAdmin, onSelectStory, onDelet
 
 StoryItem.displayName = "StoryItem"
 
-function StoryManager({ room, isAdmin, onAddStory, onDeleteStory, onSelectStory }) {
+function StoryManager({ room, isAdmin, onAddStory, onDeleteStory, onSelectStory }: { room: any, isAdmin: boolean, onAddStory: (title: string, description: string) => void, onDeleteStory: (id: string) => void, onSelectStory: (id: string) => void }) {
   const [isCreating, setIsCreating] = useState(false)
   const [newTitle, setNewTitle] = useState("")
   const [newDescription, setNewDescription] = useState("")
@@ -90,8 +89,12 @@ function StoryManager({ room, isAdmin, onAddStory, onDeleteStory, onSelectStory 
     setIsCreating(false)
   }
 
-  const stories = useMemo(() => room?.stories || [], [room?.stories])
-  const currentStoryId = useMemo(() => room?.currentStory?.id, [room?.currentStory?.id])
+  const stories = useMemo(() => {
+    const allStories = room?.stories || [];
+
+    return allStories.filter((s: any) => !s.voted);
+  }, [room?.stories]);
+  const currentStoryId = useMemo(() => room?.currentStory?.id, [room?.currentStory?.id]);
 
   return (
     <Card className="bg-card border-border">
@@ -161,7 +164,7 @@ function StoryManager({ room, isAdmin, onAddStory, onDeleteStory, onSelectStory 
           </div>
         ) : (
           <div className="space-y-2">
-            {stories.map((story) => (
+            {stories.map((story: any) => (
               <StoryItem
                 key={story.id}
                 story={story}

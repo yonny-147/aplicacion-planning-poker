@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-export default function RoomHeader({ roomCode, userName, isAdmin, currentRole = "", onChangeRole }) {
+export default function RoomHeader({ roomCode, userName, isAdmin, currentRole = "", onChangeRole }: { roomCode: string, userName: string, isAdmin: boolean, currentRole?: string, onChangeRole: (role: string) => void }) {
   const router = useRouter()
   const [copied, setCopied] = useState(false)
   const [linkCopied, setLinkCopied] = useState(false)
@@ -90,7 +90,7 @@ export default function RoomHeader({ roomCode, userName, isAdmin, currentRole = 
                 <span className="font-medium text-foreground">{userName}</span>
               </span>
             </div>
-            
+
             {!isAdmin && (
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">Rol:</span>
@@ -106,7 +106,7 @@ export default function RoomHeader({ roomCode, userName, isAdmin, currentRole = 
                 </Select>
               </div>
             )}
-            
+
             <Button
               onClick={leaveRoom}
               variant="outline"

@@ -5,26 +5,25 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, Check, Clock, Eye } from "lucide-react"
 
 
-const ParticipantItem = memo(function ParticipantItem({ participant, isAdmin, onRemove }) {
-  const isFacilitator = (participant.isAdmin && participant.adminMode === "facilitator") || 
-                        (participant.role && participant.role.toUpperCase() === "FACILITATOR")
-  
-  const getRoleLabel = (role) => {
+const ParticipantItem = memo(function ParticipantItem({ participant, isAdmin, onRemove }: { participant: any, isAdmin: boolean, onRemove: (id: string) => void }) {
+  const isFacilitator = (participant.isAdmin && participant.adminMode === "facilitator") ||
+    (participant.role && participant.role.toUpperCase() === "FACILITATOR")
+
+  const getRoleLabel = (role: string) => {
     const roleLabels = {
       "DEV": "Dev",
       "QA": "QA",
       "FACILITATOR": "Facilitador"
     }
-    return roleLabels[role?.toUpperCase()] || null
+    return roleLabels[role?.toUpperCase() as keyof typeof roleLabels] || null
   }
 
   return (
     <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
       <div className="flex items-center gap-2">
         <div
-          className={`w-2 h-2 rounded-full ${
-            isFacilitator ? "bg-blue-500" : participant.hasVoted ? "bg-accent" : "bg-muted-foreground"
-          }`}
+          className={`w-2 h-2 rounded-full ${isFacilitator ? "bg-blue-500" : participant.hasVoted ? "bg-accent" : "bg-muted-foreground"
+            }`}
         />
         <span className="text-sm font-medium">
           {participant.name}
@@ -71,7 +70,7 @@ const ParticipantItem = memo(function ParticipantItem({ participant, isAdmin, on
 })
 ParticipantItem.displayName = "ParticipantItem"
 
-function ParticipantsList({ userName, participants = [], isAdmin = false, onRemoveParticipant }) {
+function ParticipantsList({ userName, participants = [], isAdmin = false, onRemoveParticipant }: { userName: string, participants: any[], isAdmin: boolean, onRemoveParticipant: (id: string) => void }) {
   // Fuerza re-render cuando cambian profundamente los participantes (aunque no cambie la referencia)
   const [, force] = useState(0)
   const lastSnapshotRef = useRef("")
@@ -92,7 +91,7 @@ function ParticipantsList({ userName, participants = [], isAdmin = false, onRemo
 
   // Asegurar que participants sea siempre un array y eliminar duplicados
   const participantsArray = Array.isArray(participants) ? participants : [];
-  
+
   const votingParticipants = participantsArray.filter((p) => {
     // Excluir admins en modo facilitador
     if (p.isAdmin && p.adminMode === "facilitator") return false
