@@ -4,15 +4,18 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Shield, Users, FileText, Eye, UserCheck, LogOut } from "lucide-react"
+import { AlertDialogDestructive } from "./alert/delete-room-dialog"
 
 export default function AdminPanel({ room, participantId, onSetAdminMode, onDeleteRoom }: { room: any, participantId: string, onSetAdminMode: (mode: string) => void, onDeleteRoom: () => void }) {
-  const [adminMode, setAdminMode] = useState("participant")
+  const [adminMode, setAdminMode] = useState("facilitator")
 
   useEffect(() => {
     if (room && participantId) {
       const admin = Array.isArray(room.participants) ? room.participants.find((p: any) => p.id === participantId && p.isAdmin) : null
-      if (admin && admin.adminMode) {
-        setAdminMode(admin.adminMode)
+      if (admin) {
+
+        const mode = admin.adminMode || room.adminMode || "facilitator"
+        setAdminMode(mode === "open" ? "facilitator" : mode)
       }
     }
   }, [room, participantId])
@@ -46,19 +49,6 @@ export default function AdminPanel({ room, participantId, onSetAdminMode, onDele
             <h4 className="font-semibold text-sm mb-3">Modo de Administrador</h4>
             <div className="flex flex-col gap-2">
               <Button
-                onClick={() => handleModeChange("participant")}
-                size="sm"
-                variant={adminMode === "participant" ? "default" : "outline"}
-                className={
-                  adminMode === "participant"
-                    ? "cursor-pointer bg-accent hover:bg-accent/90 text-accent-foreground"
-                    : "cursor-pointer border-border hover:bg-muted"
-                }
-              >
-                <UserCheck className="w-4 h-4 mr-2" />
-                Participante
-              </Button>
-              <Button
                 onClick={() => handleModeChange("facilitator")}
                 size="sm"
                 variant={adminMode === "facilitator" ? "default" : "outline"}
@@ -70,6 +60,19 @@ export default function AdminPanel({ room, participantId, onSetAdminMode, onDele
               >
                 <Eye className="w-4 h-4 mr-2" />
                 Facilitador
+              </Button>
+              <Button
+                onClick={() => handleModeChange("participant")}
+                size="sm"
+                variant={adminMode === "participant" ? "default" : "outline"}
+                className={
+                  adminMode === "participant"
+                    ? "cursor-pointer bg-accent hover:bg-accent/90 text-accent-foreground"
+                    : "cursor-pointer border-border hover:bg-muted"
+                }
+              >
+                <UserCheck className="w-4 h-4 mr-2" />
+                Participante
               </Button>
             </div>
             <p className="text-xs text-muted-foreground mt-2">
@@ -112,15 +115,13 @@ export default function AdminPanel({ room, participantId, onSetAdminMode, onDele
             </ul>
           </div>
 
-          <Button
-            onClick={onDeleteRoom}
-            variant="destructive"
-            className="w-full cursor-pointer"
-            size="sm"
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            Cerrar y Eliminar Sala
-          </Button>
+          <AlertDialogDestructive
+            action={onDeleteRoom}
+            description="¿Estás seguro de que deseas cerrar y eliminar esta sala? Todos los participantes serán expulsados y no se podrá recuperar."
+            title="Cerrar y eliminar sala"
+            triggerText="Eliminar Sala"
+            buttonText="Cerrar y Eliminar Sala"
+          />
         </div>
       </CardContent>
     </Card>

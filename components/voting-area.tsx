@@ -11,27 +11,28 @@ const ROLES_FOR_AVERAGE = ["QA", "DEV"]
 
 function VotingArea({ isAdmin, userName, room, participantId, onVote, onReveal, onReset }: { isAdmin: boolean, userName: string, room: any, participantId: string, onVote: (vote: string) => void, onReveal: () => void, onReset: () => void }) {
   const [selectedVote, setSelectedVote] = useState<string | null>(null)
-  const [adminMode, setAdminMode] = useState("participant")
+  const [adminMode, setAdminMode] = useState("facilitator")
 
   useEffect(() => {
     if (room && participantId) {
       const participant = Array.isArray(room.participants) ? room.participants.find((p: any) => p.id === participantId) : null
       if (participant) {
         setSelectedVote(participant.vote)
-        if (participant.isAdmin && participant.adminMode) {
-          setAdminMode(participant.adminMode)
+        if (participant.isAdmin) {
+
+          const mode = participant.adminMode || room.adminMode || "facilitator"
+          setAdminMode(mode === "open" ? "facilitator" : mode)
         }
       }
     }
   }, [room, participantId])
 
-  const calculateAverage = useMemo(() => {
+  const calculateAverageByRole = useMemo(() => {
     if (!room) return null
 
     const participantsArr = Array.isArray(room.participants) ? room.participants : []
 
-    const numericVotes = participantsArr.reduce((acc: any[], participant: any) => {
-      // Excluir facilitadores (admins o con rol FACILITATOR)
+    const roleVotes = participantsArr.reduce((acc: Record<string, number[]>, participant: any) => {
       if (!participant || (participant.isAdmin && participant.adminMode === "facilitator")) {
         return acc
       }
@@ -41,7 +42,6 @@ function VotingArea({ isAdmin, userName, room, participantId, onVote, onReveal, 
         return acc
       }
 
-      // Si no tiene rol definido pero es admin en modo participante, tratarlo como DEV
       const effectiveRole = normalizedRole || (participant.isAdmin && participant.adminMode !== "facilitator" ? "DEV" : "")
 
       if (!ROLES_FOR_AVERAGE.includes(effectiveRole)) {
@@ -53,16 +53,22 @@ function VotingArea({ isAdmin, userName, room, participantId, onVote, onReveal, 
         return acc
       }
 
-      acc.push(numericValue)
+      if (!acc[effectiveRole]) acc[effectiveRole] = []
+      acc[effectiveRole].push(numericValue)
       return acc
-    }, [])
+    }, {})
 
-    if (numericVotes.length === 0) return null
+    const averages: Record<string, string> = {}
+    Object.entries(roleVotes).forEach(([role, votes]) => {
+      const sum = (votes as number[]).reduce((acc, val) => acc + val, 0)
+      averages[role] = (sum / (votes as number[]).length).toFixed(1)
+    })
 
-    const sum = numericVotes.reduce((acc: number, val: number) => acc + val, 0)
-    const avg = sum / numericVotes.length
-    return avg.toFixed(1)
+    return Object.keys(averages).length > 0 ? averages : null
   }, [room])
+
+  console.log(calculateAverageByRole)
+
 
   const roleAverages = useMemo(() => {
     if (!room?.currentStory) return {}
@@ -119,6 +125,8 @@ function VotingArea({ isAdmin, userName, room, participantId, onVote, onReveal, 
       }).filter(Boolean),
     [roleAverages],
   )
+
+  console.log(roleAverages)
 
   const votingParticipants = useMemo(
     () => {
@@ -226,23 +234,17 @@ function VotingArea({ isAdmin, userName, room, participantId, onVote, onReveal, 
                       </div>
                     ))}
                   </div>
-                  {roleAverageEntries.length > 0 && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-                      {roleAverageEntries.map((entry: any) => (
+                  {calculateAverageByRole && (
+                    <div className="flex  justify-center gap-3">
+                      {Object.entries(calculateAverageByRole).map(([role, value]: [string, string]) => (
                         <div
-                          key={entry.role}
-                          className="flex flex-col items-center justify-center p-4 bg-background rounded-lg border border-border"
+                          key={role}
+                          className="flex flex-col items-center justify-center p-4 bg-background rounded-lg border border-border w-full"
                         >
-                          <span className="text-sm font-medium text-muted-foreground">Promedio {entry.role}</span>
-                          <span className="text-2xl font-bold text-foreground">{entry.value}</span>
+                          <span className="text-sm font-medium text-muted-foreground">Promedio {role}</span>
+                          <span className="text-2xl font-bold text-primary">{value}</span>
                         </div>
                       ))}
-                    </div>
-                  )}
-                  {calculateAverage && (
-                    <div className="flex items-center justify-center gap-2 p-4 bg-accent/20 rounded-lg">
-                      <span className="text-sm font-medium text-foreground">Promedio general (QA + DEV):</span>
-                      <span className="text-3xl font-bold text-foreground">{calculateAverage}</span>
                     </div>
                   )}
                 </div>

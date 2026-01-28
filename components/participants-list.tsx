@@ -28,7 +28,7 @@ const ParticipantItem = memo(function ParticipantItem({ participant, isAdmin, on
         <span className="text-sm font-medium">
           {participant.name}
           {participant.isAdmin && (
-            <span className="ml-2 text-xs text-muted-foreground">({isFacilitator ? "Facilitador" : "Admin"})</span>
+            <span className="ml-2 text-xs text-muted-foreground">(Admin)</span>
           )}
           {participant.role && (
             <span className="ml-2 px-2 py-0.5 text-xs bg-primary/10 text-primary rounded">
