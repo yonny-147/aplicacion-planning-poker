@@ -29,11 +29,12 @@ export async function POST(request: Request) {
                     role: "",
                     vote: null,
                     hasVoted: false,
+                    adminMode: "facilitator",
                 },
             ],
             stories: [],
             votesRevealed: false,
-            adminMode: "open",
+            adminMode: "facilitator",
             selectedStoryId: null,
             createdAt: Date.now(),
         });

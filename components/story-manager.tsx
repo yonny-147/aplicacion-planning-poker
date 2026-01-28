@@ -137,7 +137,7 @@ function StoryManager({ room, isAdmin, onAddStory, onDeleteStory, onSelectStory 
               <Button
                 onClick={handleCreate}
                 size="sm"
-                className="bg-accent hover:bg-accent/90 text-black font-medium transition-all hover:shadow-md hover:scale-105 cursor-pointer"
+                className="bg-accent hover:bg-accent/90 text-white font-medium transition-all hover:shadow-md hover:scale-105 cursor-pointer"
               >
                 Crear
               </Button>
