@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Shield, Users, FileText, Eye, UserCheck, LogOut } from "lucide-react"
+import { AlertDialogDestructive } from "./alert/delete-room-dialog"
 
 export default function AdminPanel({ room, participantId, onSetAdminMode, onDeleteRoom }: { room: any, participantId: string, onSetAdminMode: (mode: string) => void, onDeleteRoom: () => void }) {
   const [adminMode, setAdminMode] = useState("facilitator")
@@ -114,15 +115,13 @@ export default function AdminPanel({ room, participantId, onSetAdminMode, onDele
             </ul>
           </div>
 
-          <Button
-            onClick={onDeleteRoom}
-            variant="destructive"
-            className="w-full cursor-pointer"
-            size="sm"
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            Cerrar y Eliminar Sala
-          </Button>
+          <AlertDialogDestructive
+            action={onDeleteRoom}
+            description="¿Estás seguro de que deseas cerrar y eliminar esta sala? Todos los participantes serán expulsados y no se podrá recuperar."
+            title="Cerrar y eliminar sala"
+            triggerText="Eliminar Sala"
+            buttonText="Cerrar y Eliminar Sala"
+          />
         </div>
       </CardContent>
     </Card>
