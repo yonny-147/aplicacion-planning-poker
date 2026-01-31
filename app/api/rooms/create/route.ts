@@ -1,5 +1,5 @@
 import db from "@/lib/firebase";
-import { generateRoomCode } from "../../../../lib/utils";
+import { generateRoomCode } from "../../../../utils/generate-room-code";
 
 export async function POST(request: Request) {
     try {

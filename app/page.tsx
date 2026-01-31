@@ -12,6 +12,7 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { toast } from "sonner";
+import { ModeToggle } from "@/components/mode-toggle";
 
 export default function HomePage() {
     const router = useRouter();
@@ -94,6 +95,9 @@ export default function HomePage() {
 
     return (
         <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+            <div className="absolute top-4 right-4 z-50">
+                <ModeToggle />
+            </div>
             <div className="w-full max-w-4xl">
                 <div className="text-center mb-12">
                     <h1 className="text-5xl font-bold mb-4 text-balance">
