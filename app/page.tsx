@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/card";
 import { toast } from "sonner";
 import { ModeToggle } from "@/components/mode-toggle";
+import { HomerHeader } from "@/components/layout/home-header";
 
 export default function HomePage() {
     const router = useRouter();
@@ -94,106 +95,106 @@ export default function HomePage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4 bg-background">
-            <div className="absolute top-4 right-4 z-50">
-                <ModeToggle />
-            </div>
-            <div className="w-full max-w-4xl">
-                <div className="text-center mb-12">
-                    <h1 className="text-5xl font-bold mb-4 text-balance">
-                        Planning Poker
-                    </h1>
-                    <p className="text-xl text-muted-foreground text-balance">
-                        Estimación ágil en tiempo real para tu equipo
-                    </p>
-                </div>
+        <section>
+            <HomerHeader />
+            <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+                <div className="w-full max-w-4xl">
+                    <div className="text-center mb-12">
+                        <h1 className="text-4xl font-bold mb-4 text-balance">
+                            Planning Poker
+                        </h1>
+                        <p className="text-xl text-muted-foreground text-balance">
+                            Estimación ágil en tiempo real para tu equipo
+                        </p>
+                    </div>
 
-                <div className="grid md:grid-cols-2 gap-6">
-                    <Card className="bg-card border-border">
-                        <CardHeader>
-                            <CardTitle className="text-2xl">
-                                Crear Sala
-                            </CardTitle>
-                            <CardDescription>
-                                Inicia una nueva sesión de Planning Poker
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div>
-                                <label
-                                    htmlFor="create-name"
-                                    className="text-sm font-medium mb-2 block"
+                    <div className="grid md:grid-cols-2 gap-6">
+                        <Card className="bg-card border-border">
+                            <CardHeader>
+                                <CardTitle className="text-2xl">
+                                    Crear Sala
+                                </CardTitle>
+                                <CardDescription>
+                                    Inicia una nueva sesión de Planning Poker
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div>
+                                    <label
+                                        htmlFor="create-name"
+                                        className="text-sm font-medium mb-2 block"
+                                    >
+                                        Tu nombre
+                                    </label>
+                                    <Input
+                                        id="create-name"
+                                        type="text"
+                                        placeholder="Ingresa tu nombre"
+                                        value={createUserName}
+                                        onChange={(e) =>
+                                            setCreateUserName(e.target.value)
+                                        }
+                                        className="bg-muted border-border text-foreground w-full"
+                                        onKeyDown={(e) =>
+                                            e.key === "Enter" && createRoom()
+                                        }
+                                    />
+                                </div>
+                                <Button
+                                    onClick={createRoom}
+                                    disabled={isCreating}
+                                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium transition-all hover:shadow-md cursor-pointer"
                                 >
-                                    Tu nombre
-                                </label>
-                                <Input
-                                    id="create-name"
-                                    type="text"
-                                    placeholder="Ingresa tu nombre"
-                                    value={createUserName}
-                                    onChange={(e) =>
-                                        setCreateUserName(e.target.value)
-                                    }
-                                    className="bg-muted border-border text-foreground w-full"
-                                    onKeyDown={(e) =>
-                                        e.key === "Enter" && createRoom()
-                                    }
-                                />
-                            </div>
-                            <Button
-                                onClick={createRoom}
-                                disabled={isCreating}
-                                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium transition-all hover:shadow-md cursor-pointer"
-                            >
-                                {isCreating ? "Creando..." : "Crear Sala"}
-                            </Button>
-                        </CardContent>
-                    </Card>
+                                    {isCreating ? "Creando..." : "Crear Sala"}
+                                </Button>
+                            </CardContent>
+                        </Card>
 
-                    <Card className="bg-card border-border">
-                        <CardHeader>
-                            <CardTitle className="text-2xl">
-                                Unirse a Sala
-                            </CardTitle>
-                            <CardDescription>
-                                Únete a una sesión existente con un código
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div>
-                                <label
-                                    htmlFor="room-code"
-                                    className="text-sm font-medium mb-2 block"
+                        <Card className="bg-card border-border">
+                            <CardHeader>
+                                <CardTitle className="text-2xl">
+                                    Unirse a Sala
+                                </CardTitle>
+                                <CardDescription>
+                                    Únete a una sesión existente con un código
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div>
+                                    <label
+                                        htmlFor="room-code"
+                                        className="text-sm font-medium mb-2 block"
+                                    >
+                                        Código de sala
+                                    </label>
+                                    <Input
+                                        id="room-code"
+                                        type="text"
+                                        placeholder="Ej: ABC123"
+                                        value={roomCode}
+                                        onChange={(e) =>
+                                            setRoomCode(
+                                                e.target.value.toUpperCase(),
+                                            )
+                                        }
+                                        className="bg-muted border-border text-foreground w-full"
+                                        onKeyDown={(e) =>
+                                            e.key === "Enter" && joinRoom()
+                                        }
+                                    />
+                                </div>
+                                <Button
+                                    onClick={joinRoom}
+                                    variant="outline"
+                                    className="w-full border-border hover:bg-muted bg-transparent font-medium transition-all hover:shadow-md cursor-pointer"
                                 >
-                                    Código de sala
-                                </label>
-                                <Input
-                                    id="room-code"
-                                    type="text"
-                                    placeholder="Ej: ABC123"
-                                    value={roomCode}
-                                    onChange={(e) =>
-                                        setRoomCode(
-                                            e.target.value.toUpperCase(),
-                                        )
-                                    }
-                                    className="bg-muted border-border text-foreground w-full"
-                                    onKeyDown={(e) =>
-                                        e.key === "Enter" && joinRoom()
-                                    }
-                                />
-                            </div>
-                            <Button
-                                onClick={joinRoom}
-                                variant="outline"
-                                className="w-full border-border hover:bg-muted bg-transparent font-medium transition-all hover:shadow-md cursor-pointer"
-                            >
-                                Unirse a Sala
-                            </Button>
-                        </CardContent>
-                    </Card>
+                                    Unirse a Sala
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    </div>
                 </div>
             </div>
-        </div>
+        </section>
     );
 }

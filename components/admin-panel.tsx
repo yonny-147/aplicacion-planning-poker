@@ -36,9 +36,9 @@ export default function AdminPanel({ room, participantId, onSetAdminMode, onDele
   }
 
   return (
-    <Card className="bg-card border border-accent/50">
+    <Card className="bg-card border border-border">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-accent">
+        <CardTitle className="flex items-center gap-2 text-primary">
           <Shield className="w-5 h-5" />
           Panel de Administrador
         </CardTitle>
@@ -54,7 +54,7 @@ export default function AdminPanel({ room, participantId, onSetAdminMode, onDele
                 variant={adminMode === "facilitator" ? "default" : "outline"}
                 className={
                   adminMode === "facilitator"
-                    ? "cursor-pointer bg-accent hover:bg-accent/90 text-accent-foreground"
+                    ? "cursor-pointer bg-primary hover:bg-primary/90 text-primary-foreground"
                     : "cursor-pointer border-border hover:bg-muted"
                 }
               >
@@ -67,7 +67,7 @@ export default function AdminPanel({ room, participantId, onSetAdminMode, onDele
                 variant={adminMode === "participant" ? "default" : "outline"}
                 className={
                   adminMode === "participant"
-                    ? "cursor-pointer bg-accent hover:bg-accent/90 text-accent-foreground"
+                    ? "cursor-pointer bg-primary hover:bg-primary/90 text-primary-foreground"
                     : "cursor-pointer border-border hover:bg-muted"
                 }
               >

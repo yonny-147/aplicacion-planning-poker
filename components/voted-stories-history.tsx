@@ -40,7 +40,7 @@ export default function VotedStoriesHistory({ room }: { room: any }) {
             <Card className="bg-card border-border">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                        <CheckCircle2 className="w-5 h-5 text-accent" />
+                        <CheckCircle2 className="w-5 h-5 text-primary" />
                         Historial de Votaciones
                     </CardTitle>
                 </CardHeader>
@@ -58,7 +58,7 @@ export default function VotedStoriesHistory({ room }: { room: any }) {
         <Card className="bg-card border-border">
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-accent" />
+                    <CheckCircle2 className="w-5 h-5 text-primary" />
                     Historial de Votaciones ({votedStories.length})
                 </CardTitle>
             </CardHeader>
@@ -89,7 +89,7 @@ export default function VotedStoriesHistory({ room }: { room: any }) {
 
                                 <div className="p-3 bg-background rounded-md">
                                     <p className="text-xs font-medium text-muted-foreground mb-2">Resultados:</p>
-                                    <p className="text-sm font-semibold text-accent">{renderResult(story)}</p>
+                                    <p className="text-sm font-semibold text-primary">{renderResult(story)}</p>
                                 </div>
 
                                 {story.votes && story.votes.length > 0 && (

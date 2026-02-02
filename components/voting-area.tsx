@@ -275,7 +275,7 @@ function VotingArea({ isAdmin, userName, room, participantId, onVote, onReveal, 
 
             {selectedVote && !isRevealed && (
               <div className="mt-6 text-center">
-                <p className="text-accent font-medium">Tu voto ha sido registrado</p>
+                <p className="text-primary font-medium">Tu voto ha sido registrado</p>
                 <p className="text-sm text-muted-foreground mt-1">
                   Esperando a que {allVoted ? "el administrador revele" : "todos voten"}...
                 </p>
