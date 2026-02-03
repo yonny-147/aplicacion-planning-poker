@@ -65,7 +65,7 @@ export default function RoomHeader({ roomCode, userName, isAdmin, currentRole = 
             </div>
             {isAdmin && (
               <>
-                <span className="px-3 py-1 bg-primary/20 text-primary text-sm font-medium rounded-full">
+                <span className="px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded-full">
                   Administrador
                 </span>
                 <Button
