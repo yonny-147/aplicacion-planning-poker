@@ -18,8 +18,9 @@ export function AlertDialogDestructive({ action, description, title, triggerText
         <AlertDialog>
             <AlertDialogTrigger asChild>
                 <Button
-                    variant="destructive"
-                    className="w-full cursor-pointer"
+                    variant="outline"
+
+                    className="w-full bg-transparent !border-destructive cursor-pointer text-destructive hover:text-destructive hover:bg-destructive/10 dark:hover:bg-destructive/20"
                     size="sm"
                 >
                     <LogOut className="w-4 h-4 mr-2" />

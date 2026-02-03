@@ -105,7 +105,7 @@ export default function AdminPanel({ room, participantId, onSetAdminMode, onDele
             </div>
           </div>
 
-          <div className="p-4 bg-accent/10 rounded-lg border border-accent/20">
+          <div className="p-4 bg-muted rounded-lg border border-accent/20">
             <h4 className="font-semibold text-sm mb-2">Controles de Administrador</h4>
             <ul className="text-sm text-muted-foreground space-y-1">
               <li>• Crear y gestionar historias de usuario</li>
