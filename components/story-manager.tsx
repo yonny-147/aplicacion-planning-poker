@@ -104,7 +104,7 @@ function StoryManager({ room, isAdmin, onAddStory, onDeleteStory, onSelectStory 
           <Button
             onClick={() => setIsCreating(true)}
             size="sm"
-            className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium transition-all hover:shadow-md hover:scale-105 cursor-pointer"
+            className="bg-primary hover:bg-primary/90 dark:text-foreground text-primary-foreground font-medium transition-all hover:shadow-md hover:scale-105 cursor-pointer"
           >
             <Plus className="w-4 h-4 mr-2" />
             Nueva Historia
@@ -137,7 +137,7 @@ function StoryManager({ room, isAdmin, onAddStory, onDeleteStory, onSelectStory 
               <Button
                 onClick={handleCreate}
                 size="sm"
-                className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium transition-all hover:shadow-md hover:scale-105 cursor-pointer"
+                className="bg-primary hover:bg-primary/90 dark:text-foreground text-primary-foreground font-medium transition-all hover:shadow-md hover:scale-105 cursor-pointer"
               >
                 Crear
               </Button>

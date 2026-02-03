@@ -48,13 +48,13 @@ export default function RoomHeader({ roomCode, userName, isAdmin, currentRole = 
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-4 flex-wrap">
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold">Plania</span>
+              <span className="text-2xl font-bold text-primary">Plania</span>
               <Separator orientation="vertical" className="!h-4 bg-muted-foreground" />
               <h1 className="text-md font-medium text-muted-foreground">Planning Poker</h1>
             </div>
             <div className="flex items-center gap-2 px-4 py-2 bg-muted rounded-lg">
               <span className="text-sm text-muted-foreground">Sala:</span>
-              <span className="font-mono font-medium text-primary">{roomCode}</span>
+              <span className="font-mono font-medium text-foreground">{roomCode}</span>
               <button
                 onClick={copyRoomCode}
                 className="ml-2 p-1 hover:bg-background rounded transition-colors cursor-pointer"
@@ -71,7 +71,7 @@ export default function RoomHeader({ roomCode, userName, isAdmin, currentRole = 
                 <Button
                   onClick={shareRoomLink}
                   size="sm"
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground cursor-pointer"
+                  className="bg-muted hover:bg-muted/90 text-foreground cursor-pointer"
                 >
                   {linkCopied ? (
                     <>
@@ -101,7 +101,7 @@ export default function RoomHeader({ roomCode, userName, isAdmin, currentRole = 
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">Rol:</span>
                 <Select value={normalizedRole} onValueChange={onChangeRole}>
-                  <SelectTrigger className="w-[140px] h-9 bg-background border-border">
+                  <SelectTrigger className="w-[140px] h-9 bg-background border-border text-foreground">
                     <SelectValue placeholder="Seleccionar rol" />
                   </SelectTrigger>
                   <SelectContent>

@@ -72,7 +72,7 @@ export default function VotedStoriesHistory({ room }: { room: any }) {
                             <div className="flex items-start justify-between gap-2 mb-2">
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 mb-1">
-                                        <CheckCircle2 className="w-4 h-4 text-accent flex-shrink-0" />
+                                        <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
                                         <h4 className="font-medium text-sm">{story.title}</h4>
                                     </div>
                                     {story.description && (
@@ -87,7 +87,7 @@ export default function VotedStoriesHistory({ room }: { room: any }) {
                                     <span>{formatDate(story.votedAt)}</span>
                                 </div>
 
-                                <div className="p-3 bg-background rounded-md">
+                                <div className="p-3 dark:bg-neutral-900 bg-white rounded-md">
                                     <p className="text-xs font-medium text-muted-foreground mb-2">Resultados:</p>
                                     <p className="text-sm font-semibold text-primary">{renderResult(story)}</p>
                                 </div>
@@ -99,7 +99,7 @@ export default function VotedStoriesHistory({ room }: { room: any }) {
                                             {story.votes.map((vote: any, idx: number) => (
                                                 <div
                                                     key={idx}
-                                                    className="flex items-center justify-between text-xs p-2 bg-background rounded"
+                                                    className="flex items-center justify-between text-xs p-2 bg-white dark:bg-neutral-900 rounded"
                                                 >
                                                     <span className="text-muted-foreground truncate">
                                                         {vote.participantName}

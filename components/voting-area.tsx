@@ -181,7 +181,7 @@ function VotingArea({ isAdmin, userName, room, participantId, onVote, onReveal, 
                 <Button
                   onClick={onReveal}
                   size="sm"
-                  className="bg-accent hover:bg-accent/90 text-accent-foreground font-medium transition-all hover:shadow-md hover:scale-105 cursor-pointer"
+                  className="bg-primary hover:bg-primary/90 text-white font-medium transition-all hover:shadow-md hover:scale-105 cursor-pointer"
                 >
                   <Eye className="w-4 h-4 mr-2" />
                   Revelar Votos
@@ -225,7 +225,7 @@ function VotingArea({ isAdmin, userName, room, participantId, onVote, onReveal, 
                     {votingParticipants.map((participant: any) => (
                       <div
                         key={participant.id}
-                        className="flex items-center justify-between p-3 bg-background rounded-lg"
+                        className="flex items-center justify-between p-3 bg-white dark:bg-neutral-900 rounded-lg"
                       >
                         <span className="text-sm font-medium">{participant.name}</span>
                         <span className="text-lg font-bold text-primary">
@@ -239,9 +239,9 @@ function VotingArea({ isAdmin, userName, room, participantId, onVote, onReveal, 
                       {Object.entries(calculateAverageByRole).map(([role, value]: [string, string]) => (
                         <div
                           key={role}
-                          className="flex flex-col items-center justify-center p-4 bg-background rounded-lg border border-border w-full"
+                          className="flex flex-col items-center justify-center p-4 bg-white dark:bg-neutral-900 rounded-lg border border-border w-full"
                         >
-                          <span className="text-sm font-medium text-muted-foreground">Promedio {role}</span>
+                          <span className="text-sm font-medium text-foreground">Promedio {role}</span>
                           <span className="text-2xl font-bold text-primary">{value}</span>
                         </div>
                       ))}

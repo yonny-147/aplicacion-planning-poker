@@ -22,7 +22,7 @@ const ParticipantItem = memo(function ParticipantItem({ participant, isAdmin, on
     <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
       <div className="flex items-center gap-2">
         <div
-          className={`w-2 h-2 rounded-full ${isFacilitator ? "bg-blue-500" : participant.hasVoted ? "bg-accent" : "bg-muted-foreground"
+          className={`w-2 h-2 rounded-full ${isFacilitator ? "bg-blue-500" : participant.hasVoted ? "bg-primary" : "bg-muted-foreground"
             }`}
         />
         <span className="text-sm font-medium">
