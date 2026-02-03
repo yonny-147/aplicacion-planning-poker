@@ -49,7 +49,7 @@ const StoryItem = memo(({ story, currentStoryId, isAdmin, onSelectStory, onDelet
                 onSelectStory(story.id)
               }}
               size="sm"
-              className="h-8 px-3 text-xs bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 hover:border-primary/40 transition-all hover:shadow-sm font-medium cursor-pointer"
+              className="h-8 px-3 text-xs bg-red-400/10 hover:bg-red-400/40 text-red-400 border border-red-400/20 hover:border-red-400/30 transition-all hover:shadow-sm font-medium cursor-pointer"
             >
               Seleccionar
             </Button>
