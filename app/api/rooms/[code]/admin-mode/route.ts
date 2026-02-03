@@ -37,7 +37,16 @@ export async function POST(
             );
         }
 
-        // Actualizar modo admin
+        const participantIndex = roomData.participants.findIndex(
+            (p: any) => p.id === participantId,
+        );
+
+        if (participantIndex !== -1) {
+            await roomRef
+                .child(`participants/${participantIndex}/adminMode`)
+                .set(mode);
+        }
+
         await roomRef.child("adminMode").set(mode);
 
         // Obtener datos actualizados

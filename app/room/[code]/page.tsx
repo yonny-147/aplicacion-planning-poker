@@ -123,10 +123,6 @@ export default function RoomPage() {
 
   // Función para eliminar la sala completa
   const handleDeleteRoom = async () => {
-    if (!confirm("¿Estás seguro de que deseas cerrar y eliminar esta sala? Todos los participantes serán expulsados y no se podrá recuperar.")) {
-      return
-    }
-
     try {
       await deleteRoomAndExit()
 

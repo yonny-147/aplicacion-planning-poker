@@ -11,6 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { ModeToggle } from "./mode-toggle"
+import { Separator } from "./ui/separator"
 
 export default function RoomHeader({ roomCode, userName, isAdmin, currentRole = "", onChangeRole }: { roomCode: string, userName: string, isAdmin: boolean, currentRole?: string, onChangeRole: (role: string) => void }) {
   const router = useRouter()
@@ -45,10 +47,14 @@ export default function RoomHeader({ roomCode, userName, isAdmin, currentRole = 
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-4 flex-wrap">
-            <h1 className="text-2xl font-bold">Planning Poker</h1>
+            <div className="flex items-center gap-2">
+              <span className="text-2xl font-bold">Plania</span>
+              <Separator orientation="vertical" className="!h-4 bg-muted-foreground" />
+              <h1 className="text-md font-medium text-muted-foreground">Planning Poker</h1>
+            </div>
             <div className="flex items-center gap-2 px-4 py-2 bg-muted rounded-lg">
               <span className="text-sm text-muted-foreground">Sala:</span>
-              <span className="font-mono font-bold text-primary">{roomCode}</span>
+              <span className="font-mono font-medium text-primary">{roomCode}</span>
               <button
                 onClick={copyRoomCode}
                 className="ml-2 p-1 hover:bg-background rounded transition-colors cursor-pointer"
@@ -59,7 +65,7 @@ export default function RoomHeader({ roomCode, userName, isAdmin, currentRole = 
             </div>
             {isAdmin && (
               <>
-                <span className="px-3 py-1 bg-accent/20 text-accent text-sm font-medium rounded-full">
+                <span className="px-3 py-1 bg-primary/20 text-primary text-sm font-medium rounded-full">
                   Administrador
                 </span>
                 <Button
@@ -116,6 +122,7 @@ export default function RoomHeader({ roomCode, userName, isAdmin, currentRole = 
               <LogOut className="w-4 h-4 mr-2" />
               Salir
             </Button>
+            <ModeToggle />
           </div>
         </div>
       </div>

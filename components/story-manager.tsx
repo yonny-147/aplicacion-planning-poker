@@ -113,14 +113,14 @@ function StoryManager({ room, isAdmin, onAddStory, onDeleteStory, onSelectStory 
       </CardHeader>
       <CardContent>
         {isCreating && (
-          <div className="mb-4 p-4 bg-muted rounded-lg space-y-3">
+          <div className="mb-4 p-4 bg-card border border-border rounded-lg space-y-3">
             <div>
               <label className="text-sm font-medium mb-1 block">Título</label>
               <Input
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
                 placeholder="Ej: Implementar login de usuario"
-                className="bg-background border-border"
+                className="bg-muted border-border text-foreground"
                 autoFocus
               />
             </div>
@@ -130,14 +130,14 @@ function StoryManager({ room, isAdmin, onAddStory, onDeleteStory, onSelectStory 
                 value={newDescription}
                 onChange={(e) => setNewDescription(e.target.value)}
                 placeholder="Como usuario, quiero..."
-                className="bg-background border-border min-h-20"
+                className="bg-muted border-border text-foreground min-h-20"
               />
             </div>
             <div className="flex gap-2">
               <Button
                 onClick={handleCreate}
                 size="sm"
-                className="bg-accent hover:bg-accent/90 text-black font-medium transition-all hover:shadow-md hover:scale-105 cursor-pointer"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium transition-all hover:shadow-md hover:scale-105 cursor-pointer"
               >
                 Crear
               </Button>

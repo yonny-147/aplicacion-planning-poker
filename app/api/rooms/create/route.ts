@@ -1,5 +1,5 @@
 import db from "@/lib/firebase";
-import { generateRoomCode } from "../../../../lib/utils";
+import { generateRoomCode } from "../../../../utils/generate-room-code";
 
 export async function POST(request: Request) {
     try {
@@ -29,11 +29,12 @@ export async function POST(request: Request) {
                     role: "",
                     vote: null,
                     hasVoted: false,
+                    adminMode: "facilitator",
                 },
             ],
             stories: [],
             votesRevealed: false,
-            adminMode: "open",
+            adminMode: "facilitator",
             selectedStoryId: null,
             createdAt: Date.now(),
         });
