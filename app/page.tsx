@@ -109,7 +109,7 @@ export default function HomePage() {
                     </div>
 
                     <div className="grid md:grid-cols-2 gap-6">
-                        <Card className="bg-card border-border">
+                        <Card className="bg-card">
                             <CardHeader>
                                 <CardTitle className="text-2xl">
                                     Crear Sala
@@ -134,7 +134,7 @@ export default function HomePage() {
                                         onChange={(e) =>
                                             setCreateUserName(e.target.value)
                                         }
-                                        className="bg-muted border-border text-foreground w-full"
+                                        className="bg-muted border-border text-foreground w-full shadow-none"
                                         onKeyDown={(e) =>
                                             e.key === "Enter" && createRoom()
                                         }
@@ -143,7 +143,7 @@ export default function HomePage() {
                                 <Button
                                     onClick={createRoom}
                                     disabled={isCreating}
-                                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium transition-all hover:shadow-md cursor-pointer"
+                                    className="w-full bg-primary hover:bg-primary/90 dark:text-foreground text-primary-foreground font-medium transition-all cursor-pointer hover:shadow-sm hover:shadow-brand"
                                 >
                                     {isCreating ? "Creando..." : "Crear Sala"}
                                 </Button>
@@ -177,7 +177,7 @@ export default function HomePage() {
                                                 e.target.value.toUpperCase(),
                                             )
                                         }
-                                        className="bg-muted border-border text-foreground w-full"
+                                        className="bg-muted border-border text-foreground w-full shadow-none"
                                         onKeyDown={(e) =>
                                             e.key === "Enter" && joinRoom()
                                         }
@@ -186,7 +186,7 @@ export default function HomePage() {
                                 <Button
                                     onClick={joinRoom}
                                     variant="outline"
-                                    className="w-full border-border hover:bg-muted bg-transparent font-medium transition-all hover:shadow-md cursor-pointer"
+                                    className="w-full border-border hover:bg-muted bg-background font-medium transition-all cursor-pointer shadow-none"
                                 >
                                     Unirse a Sala
                                 </Button>

@@ -38,7 +38,7 @@ export default function AdminPanel({ room, participantId, onSetAdminMode, onDele
   return (
     <Card className="bg-card border border-border">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-primary">
+        <CardTitle className="flex items-center gap-2 text-foreground">
           <Shield className="w-5 h-5" />
           Panel de Administrador
         </CardTitle>
@@ -54,7 +54,7 @@ export default function AdminPanel({ room, participantId, onSetAdminMode, onDele
                 variant={adminMode === "facilitator" ? "default" : "outline"}
                 className={
                   adminMode === "facilitator"
-                    ? "cursor-pointer bg-primary hover:bg-primary/90 text-primary-foreground"
+                    ? "cursor-pointer bg-primary hover:bg-primary/90 dark:text-foreground text-primary-foreground"
                     : "cursor-pointer border-border hover:bg-muted"
                 }
               >
@@ -67,7 +67,7 @@ export default function AdminPanel({ room, participantId, onSetAdminMode, onDele
                 variant={adminMode === "participant" ? "default" : "outline"}
                 className={
                   adminMode === "participant"
-                    ? "cursor-pointer bg-primary hover:bg-primary/90 text-primary-foreground"
+                    ? "cursor-pointer bg-primary hover:bg-primary/90 dark:text-foreground text-primary-foreground"
                     : "cursor-pointer border-border hover:bg-muted"
                 }
               >
@@ -105,7 +105,7 @@ export default function AdminPanel({ room, participantId, onSetAdminMode, onDele
             </div>
           </div>
 
-          <div className="p-4 bg-accent/10 rounded-lg border border-accent/20">
+          <div className="p-4 bg-muted rounded-lg border border-accent/20">
             <h4 className="font-semibold text-sm mb-2">Controles de Administrador</h4>
             <ul className="text-sm text-muted-foreground space-y-1">
               <li>• Crear y gestionar historias de usuario</li>

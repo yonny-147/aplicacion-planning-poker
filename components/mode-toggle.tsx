@@ -36,7 +36,7 @@ export function ModeToggle() {
     }
 
     return (
-        <Button variant="outline" size="icon" onClick={cycleTheme}>
+        <Button variant="outline" size="icon" onClick={cycleTheme} className="shadow-xs cursor-pointer">
             {theme === "light" && (
                 <Sun className="h-[1.2rem] w-[1.2rem] transition-all" />
             )}

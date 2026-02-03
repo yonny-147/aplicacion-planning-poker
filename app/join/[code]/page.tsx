@@ -110,11 +110,11 @@ export default function JoinRoomPage() {
 
       const data = finalData
 
-  localStorage.setItem("userName", userName.trim())
-  localStorage.setItem("isAdmin", "false")
-  localStorage.setItem("participantId", data.participantId)
-  localStorage.setItem(`planning-poker-participant-${roomCode}`, data.participantId)
-  localStorage.setItem(`planning-poker-role-${roomCode}`, role)
+      localStorage.setItem("userName", userName.trim())
+      localStorage.setItem("isAdmin", "false")
+      localStorage.setItem("participantId", data.participantId)
+      localStorage.setItem(`planning-poker-participant-${roomCode}`, data.participantId)
+      localStorage.setItem(`planning-poker-role-${roomCode}`, role)
 
       // Redirigir a la sala
       router.push(`/room/${roomCode}`)
@@ -147,7 +147,7 @@ export default function JoinRoomPage() {
             <CardDescription>La sala con código "{roomCode}" no existe o ha sido cerrada.</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button onClick={() => router.push("/")} className="w-full bg-primary hover:bg-primary/90 cursor-pointer">
+            <Button onClick={() => router.push("/")} className="w-full bg-primary text-foreground hover:bg-primary/90 cursor-pointer">
               Volver al inicio
             </Button>
           </CardContent>
@@ -194,13 +194,13 @@ export default function JoinRoomPage() {
             <div className="mt-4">
               <label className="block mb-2 text-sm font-medium">Selecciona tu rol:</label>
               <div className="flex gap-4">
-                <Button variant={role === "QA" ? "default" : "outline"} className="cursor-pointer" onClick={() => setRole("QA")} disabled={isJoining}>
+                <Button variant={role === "QA" ? "default" : "outline"} className="cursor-pointer dark:text-foreground" onClick={() => setRole("QA")} disabled={isJoining}>
                   QA
                 </Button>
-                <Button variant={role === "DEV" ? "default" : "outline"} className="cursor-pointer" onClick={() => setRole("DEV")} disabled={isJoining}>
+                <Button variant={role === "DEV" ? "default" : "outline"} className="cursor-pointer dark:text-foreground" onClick={() => setRole("DEV")} disabled={isJoining}>
                   DEV
                 </Button>
-                <Button variant={role === "facilitator" ? "default" : "outline"} className="cursor-pointer" onClick={() => setRole("facilitator")} disabled={isJoining}>
+                <Button variant={role === "facilitator" ? "default" : "outline"} className="cursor-pointer dark:text-foreground" onClick={() => setRole("facilitator")} disabled={isJoining}>
                   Facilitador
                 </Button>
               </div>
@@ -216,7 +216,7 @@ export default function JoinRoomPage() {
           <Button
             onClick={handleJoin}
             disabled={isJoining || !userName.trim() || !role}
-            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground cursor-pointer"
+            className="w-full bg-primary hover:bg-primary/90 dark:text-foreground text-primary-foreground cursor-pointer"
           >
             {isJoining ? "Uniéndose..." : "Unirse a la sala"}
           </Button>

@@ -24,7 +24,7 @@ export default function VotingCard({ value, isSelected, onSelect, isRevealed, is
       `}
     >
       {getCardDisplay(value)}
-      {isSelected && !isRevealed && <div className="absolute -top-1 -right-1 w-3 h-3 bg-accent rounded-full" />}
+      {/* {isSelected && !isRevealed && <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary-foreground rounded-full" />} */}
     </button>
   )
 }

@@ -22,7 +22,7 @@ const ParticipantItem = memo(function ParticipantItem({ participant, isAdmin, on
     <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
       <div className="flex items-center gap-2">
         <div
-          className={`w-2 h-2 rounded-full ${isFacilitator ? "bg-blue-500" : participant.hasVoted ? "bg-accent" : "bg-muted-foreground"
+          className={`w-2 h-2 rounded-full ${isFacilitator ? "bg-blue-500" : participant.hasVoted ? "bg-primary" : "bg-muted-foreground"
             }`}
         />
         <span className="text-sm font-medium">
@@ -31,7 +31,7 @@ const ParticipantItem = memo(function ParticipantItem({ participant, isAdmin, on
             <span className="ml-2 text-xs text-muted-foreground">(Admin)</span>
           )}
           {participant.role && (
-            <span className="ml-2 px-2 py-0.5 text-xs bg-primary/10 text-primary rounded">
+            <span className="ml-2 px-2 py-0.5 text-xs bg-red-400/10 text-red-400 rounded">
               {getRoleLabel(participant.role)}
             </span>
           )}
@@ -47,7 +47,7 @@ const ParticipantItem = memo(function ParticipantItem({ participant, isAdmin, on
         )}
         {isAdmin && !participant.isAdmin && onRemove && (
           <button
-            className="ml-2 px-2 py-1 text-xs bg-destructive text-white rounded hover:bg-destructive/80 cursor-pointer transition-all"
+            className="ml-2 px-2 py-1 text-xs bg-transparent border border-destructive text-destructive rounded hover:bg-destructive/10 cursor-pointer transition-all"
             onClick={() => onRemove(participant.id)}
           >
             Eliminar

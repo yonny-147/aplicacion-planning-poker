@@ -4,13 +4,13 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
+    --card: #ffffff;
+    --card-foreground: #020617;
     --popover: oklch(1 0 0);
     --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
+    --primary: #e30518;
     --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
+    --secondary: #f1f5f9;
     --secondary-foreground: oklch(0.205 0 0);
     --muted: oklch(0.97 0 0);
     --muted-foreground: oklch(0.556 0 0);
@@ -40,12 +40,14 @@
     --font-serif: var(--v0-font-source-serif-4);
     --shadow-x: 0px;
     --shadow-y: 0px;
-    --shadow-blur: 4px;
+    --shadow-blur: 2px;
     --shadow-spread: 0px;
     --shadow-opacity: 0.4;
-    --shadow-color: #000000;
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
+    --shadow-color: #0f172a;
+    --shadow-strength: 0.08;
+    --shadow-brand: #e10517;
+    --background: #f8fafc;
+    --foreground: #020617;
 }
 
 @theme inline {
@@ -167,7 +169,7 @@
     --card-foreground: oklch(0.985 0 0);
     --popover: oklch(0.205 0 0);
     --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
+    --primary: #dc2626;
     --primary-foreground: oklch(0.205 0 0);
     --secondary: oklch(0.269 0 0);
     --secondary-foreground: oklch(0.985 0 0);
@@ -198,5 +200,6 @@
     --shadow-blur: 0px;
     --shadow-spread: 0px;
     --shadow-opacity: 1;
-    --shadow-color: #000000;
+    --shadow-color: 0 0% 0%;
+    --shadow-strength: 0.45;
 }

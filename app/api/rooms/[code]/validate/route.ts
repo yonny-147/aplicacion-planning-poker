@@ -7,19 +7,17 @@ export async function GET(
     try {
         const { code } = params;
 
-        // Validar que el código tenga el formato correcto (6 caracteres alfanuméricos)
-        if (!code || code.length !== 6 || !/^[A-Z0-9]+$/.test(code)) {
+        if (!code || code.length !== 8 || !/^[A-Z0-9]+$/.test(code)) {
             return Response.json(
                 {
                     valid: false,
                     exists: false,
-                    error: "Código inválido. Debe tener 6 caracteres alfanuméricos.",
+                    error: "Código inválido. Debe tener 8 caracteres alfanuméricos.",
                 },
                 { status: 400 },
             );
         }
 
-        // Verificar si la sala existe en Firebase
         const roomRef = db.ref(`planning-poker/rooms/${code}`);
         const snapshot = await roomRef.once("value");
         const roomData = snapshot.val();
@@ -35,10 +33,9 @@ export async function GET(
             );
         }
 
-        // Verificar si la sala está activa (opcional: puedes agregar lógica de expiración)
         const createdAt = roomData.createdAt;
         const now = Date.now();
-        const maxAge = 24 * 60 * 60 * 1000; // 24 horas en milisegundos
+        const maxAge = 24 * 60 * 60 * 1000;
 
         if (now - createdAt > maxAge) {
             return Response.json(
@@ -51,7 +48,6 @@ export async function GET(
             );
         }
 
-        // La sala es válida
         return Response.json({
             valid: true,
             exists: true,
