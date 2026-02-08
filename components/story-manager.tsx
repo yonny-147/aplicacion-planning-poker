@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Plus, Trash2, CheckCircle2, ChevronRight } from "lucide-react"
+import { Plus, Trash2, CheckCircle2, ChevronRight, Check } from "lucide-react"
 
 const StoryItem = memo(({ story, currentStoryId, isAdmin, onSelectStory, onDeleteStory }: { story: any, currentStoryId: string, isAdmin: boolean, onSelectStory: (id: string) => void, onDeleteStory: (id: string) => void }) => {
   const isActive = story.id === currentStoryId
@@ -23,9 +23,9 @@ const StoryItem = memo(({ story, currentStoryId, isAdmin, onSelectStory, onDelet
 
   return (
     <div
-      className={`p-3 rounded-lg border-2 transition-all cursor-pointer ${isActive
-        ? "bg-primary/10 border-primary shadow-md"
-        : "bg-muted border-transparent hover:border-border hover:shadow-sm"
+      className={`p-3 rounded-lg border-2 transition-all cursor-pointer bg-muted ${isActive
+        ? " border-primary shadow-md"
+        : " border-transparent hover:border-border hover:shadow-sm"
         }`}
       onClick={() => isAdmin && !isActive && onSelectStory(story.id)}
     >
@@ -33,7 +33,7 @@ const StoryItem = memo(({ story, currentStoryId, isAdmin, onSelectStory, onDelet
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
             {isActive && <ChevronRight className="w-4 h-4 text-primary" />}
-            <h4 className={`font-medium text-sm truncate ${isActive ? "text-primary" : ""}`}>{story.title}</h4>
+            <h4 className={`font-medium text-sm truncate`}>{story.title}</h4>
             {story.voted && <CheckCircle2 className="w-4 h-4 text-accent" />}
           </div>
           {story.description && <p className="text-xs text-muted-foreground line-clamp-2">{story.description}</p>}
@@ -42,7 +42,7 @@ const StoryItem = memo(({ story, currentStoryId, isAdmin, onSelectStory, onDelet
           )}
         </div>
         <div className="flex gap-1">
-          {isAdmin && !isActive && (
+          {isAdmin && (
             <Button
               onClick={(e) => {
                 e.stopPropagation()
@@ -51,7 +51,8 @@ const StoryItem = memo(({ story, currentStoryId, isAdmin, onSelectStory, onDelet
               size="sm"
               className="h-8 px-3 text-xs bg-red-400/10 hover:bg-red-400/40 text-red-400 border border-red-400/20 hover:border-red-400/30 transition-all hover:shadow-sm font-medium cursor-pointer"
             >
-              Seleccionar
+              {isActive ? "Seleccionada" : "Seleccionar"}
+              {isActive && <Check className="w-4 h-4 text-red-400" />}
             </Button>
           )}
           {isAdmin && (
@@ -94,12 +95,12 @@ function StoryManager({ room, isAdmin, onAddStory, onDeleteStory, onSelectStory 
 
     return allStories.filter((s: any) => !s.voted);
   }, [room?.stories]);
-  const currentStoryId = useMemo(() => room?.currentStory?.id, [room?.currentStory?.id]);
+  const currentStoryId = useMemo(() => room?.selectedStoryId, [room?.selectedStoryId]);
 
   return (
     <Card className="bg-card border-border">
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Historias de Usuario</CardTitle>
+        <CardTitle className="text-muted-foreground">Historias de Usuario</CardTitle>
         {isAdmin && !isCreating && (
           <Button
             onClick={() => setIsCreating(true)}

@@ -67,9 +67,6 @@ function VotingArea({ isAdmin, userName, room, participantId, onVote, onReveal, 
     return Object.keys(averages).length > 0 ? averages : null
   }, [room])
 
-  console.log(calculateAverageByRole)
-
-
   const roleAverages = useMemo(() => {
     if (!room?.currentStory) return {}
 
@@ -126,7 +123,6 @@ function VotingArea({ isAdmin, userName, room, participantId, onVote, onReveal, 
     [roleAverages],
   )
 
-  console.log(roleAverages)
 
   const votingParticipants = useMemo(
     () => {
@@ -174,7 +170,7 @@ function VotingArea({ isAdmin, userName, room, participantId, onVote, onReveal, 
     <div className="space-y-6">
       <Card className="bg-card border-border">
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Historia Actual</CardTitle>
+          <CardTitle className="text-muted-foreground">Historia Actual</CardTitle>
           {isAdmin && currentStory && (
             <div className="flex gap-2">
               {allVoted && !isRevealed && (
@@ -257,7 +253,7 @@ function VotingArea({ isAdmin, userName, room, participantId, onVote, onReveal, 
       {currentStory && !isFacilitator && (
         <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle>Selecciona tu estimación</CardTitle>
+            <CardTitle className="text-muted-foreground">Selecciona tu estimación</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap justify-center gap-4">
