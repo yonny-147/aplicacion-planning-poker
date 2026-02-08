@@ -39,7 +39,7 @@ export default function VotedStoriesHistory({ room }: { room: any }) {
         return (
             <Card className="bg-card border-border">
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
+                    <CardTitle className="flex items-center gap-2 text-muted-foreground">
                         <CheckCircle2 className="w-5 h-5 text-primary" />
                         Historial de Votaciones
                     </CardTitle>
