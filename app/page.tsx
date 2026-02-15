@@ -81,7 +81,7 @@ export default function HomePage() {
     return (
         <section>
             <HomerHeader />
-            <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+            <div className="min-h-[calc(100vh-64px)] flex items-center justify-center p-4 bg-background">
                 <div className="w-full max-w-4xl">
                     <div className="text-center mb-12">
                         <h1 className="text-4xl font-bold mb-4 text-balance">
