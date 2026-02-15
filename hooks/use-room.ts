@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
 import {
+    joinRoom as joinRoomApi,
     voteRoom,
     revealRoom,
     resetRoom,
@@ -100,63 +101,45 @@ export function useRoom(
     // Convert roomCode to string if it's an array
     const code = Array.isArray(roomCode) ? roomCode[0] : roomCode;
 
+    const initialJoinMutation = useMutation({
+        mutationFn: async () => {
+            let storedParticipantId = localStorage.getItem(
+                `planning-poker-participant-${code}`,
+            );
+            if (!storedParticipantId) {
+                storedParticipantId = localStorage.getItem("participantId");
+            }
+            const storedRole =
+                localStorage.getItem(`planning-poker-role-${code}`) || "";
+            return joinRoomApi(code, {
+                participantName: userName,
+                participantId:
+                    storedParticipantId ??
+                    `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+                role: storedRole,
+            });
+        },
+        onSuccess: (data) => {
+            setRoom(data.room as Room);
+            setParticipantId(data.participantId);
+            localStorage.setItem("participantId", data.participantId);
+            localStorage.setItem(
+                `planning-poker-participant-${code}`,
+                data.participantId,
+            );
+            setIsLoading(false);
+        },
+        onError: (err) => {
+            setError(
+                err instanceof Error ? err.message : "Error desconocido",
+            );
+            setIsLoading(false);
+        },
+    });
+
     useEffect(() => {
         if (!code || !userName) return;
-
-        const joinRoom = async () => {
-            try {
-                let storedParticipantId = localStorage.getItem(
-                    `planning-poker-participant-${code}`,
-                );
-
-                // Si no existe un ID específico para esta sala, intentar con el ID general
-                if (!storedParticipantId) {
-                    storedParticipantId = localStorage.getItem("participantId");
-                }
-
-                // Obtener el rol guardado si existe
-                const storedRole =
-                    localStorage.getItem(`planning-poker-role-${code}`) || "";
-
-                const response = await fetch(`/api/rooms/${code}/join`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        participantName: userName,
-                        participantId: storedParticipantId, // Enviar el ID al servidor
-                        role: storedRole, // Enviar el rol guardado
-                    }),
-                });
-
-                if (response.status === 409) {
-                    const errorData = await response.json();
-                    throw new Error(
-                        errorData.error || "Este nombre ya está en uso",
-                    );
-                }
-
-                if (!response.ok) throw new Error("Error al unirse a la sala");
-
-                const data = await response.json();
-                setRoom(data.room);
-                setParticipantId(data.participantId);
-
-                localStorage.setItem("participantId", data.participantId);
-                localStorage.setItem(
-                    `planning-poker-participant-${code}`,
-                    data.participantId,
-                );
-
-                setIsLoading(false);
-            } catch (err) {
-                setError(
-                    err instanceof Error ? err.message : "Error desconocido",
-                );
-                setIsLoading(false);
-            }
-        };
-
-        joinRoom();
+        initialJoinMutation.mutate();
     }, [code, userName]);
 
     // Efecto para establecer conexión SSE - solo se ejecuta UNA VEZ por roomCode
