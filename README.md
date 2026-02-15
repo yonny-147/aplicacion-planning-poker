@@ -60,6 +60,7 @@ Lee [FRONTEND_SETUP.md](FRONTEND_SETUP.md) para:
 
 - [FIREBASE.md](FIREBASE.md) - Setup de Firebase
 - [FRONTEND_SETUP.md](FRONTEND_SETUP.md) - Integración frontend
+- [docs/REACT_QUERY.md](docs/REACT_QUERY.md) - Uso de React Query (TanStack Query) en la app
 - [MIGRATION_SUMMARY.md](MIGRATION_SUMMARY.md) - Historial de cambios
 
 ---

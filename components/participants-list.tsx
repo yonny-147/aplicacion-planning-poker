@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, Check, Clock, Eye } from "lucide-react"
 
 
-const ParticipantItem = memo(function ParticipantItem({ participant, isAdmin, onRemove }: { participant: any, isAdmin: boolean, onRemove: (id: string) => void }) {
+const ParticipantItem = memo(function ParticipantItem({ participant, isAdmin, onRemove, isRemoving }: { participant: any, isAdmin: boolean, onRemove: (id: string) => void, isRemoving?: boolean }) {
   const isFacilitator = (participant.isAdmin && participant.adminMode === "facilitator") ||
     (participant.role && participant.role.toUpperCase() === "FACILITATOR")
 
@@ -47,10 +47,11 @@ const ParticipantItem = memo(function ParticipantItem({ participant, isAdmin, on
         )}
         {isAdmin && !participant.isAdmin && onRemove && (
           <button
-            className="ml-2 px-2 py-1 text-xs bg-transparent border border-destructive text-destructive rounded hover:bg-destructive/10 cursor-pointer transition-all"
+            className="ml-2 px-2 py-1 text-xs bg-transparent border border-destructive text-destructive rounded hover:bg-destructive/10 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={() => onRemove(participant.id)}
+            disabled={isRemoving}
           >
-            Eliminar
+            {isRemoving ? "..." : "Eliminar"}
           </button>
         )}
       </div>
@@ -65,12 +66,13 @@ const ParticipantItem = memo(function ParticipantItem({ participant, isAdmin, on
     prevProps.participant.role === nextProps.participant.role &&
     prevProps.participant.adminMode === nextProps.participant.adminMode &&
     prevProps.participant.isAdmin === nextProps.participant.isAdmin &&
-    prevProps.isAdmin === nextProps.isAdmin
+    prevProps.isAdmin === nextProps.isAdmin &&
+    prevProps.isRemoving === nextProps.isRemoving
   )
 })
 ParticipantItem.displayName = "ParticipantItem"
 
-function ParticipantsList({ userName, participants = [], isAdmin = false, onRemoveParticipant }: { userName: string, participants: any[], isAdmin: boolean, onRemoveParticipant: (id: string) => void }) {
+function ParticipantsList({ userName, participants = [], isAdmin = false, onRemoveParticipant, isRemovingParticipant = false }: { userName: string, participants: any[], isAdmin: boolean, onRemoveParticipant: (id: string) => void, isRemovingParticipant?: boolean }) {
   // Fuerza re-render cuando cambian profundamente los participantes (aunque no cambie la referencia)
   const [, force] = useState(0)
   const lastSnapshotRef = useRef("")
@@ -121,6 +123,7 @@ function ParticipantsList({ userName, participants = [], isAdmin = false, onRemo
               participant={participant}
               isAdmin={isAdmin}
               onRemove={onRemoveParticipant}
+              isRemoving={isRemovingParticipant}
             />
           ))}
         </div>

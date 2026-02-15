@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -12,49 +13,26 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { toast } from "sonner";
-import { ModeToggle } from "@/components/mode-toggle";
 import { HomerHeader } from "@/components/layout/home-header";
+import { createRoom as apiCreateRoom, validateRoom } from "@/lib/api/rooms";
 
 export default function HomePage() {
     const router = useRouter();
     const [roomCode, setRoomCode] = useState("");
     const [createUserName, setCreateUserName] = useState("");
-    const [isCreating, setIsCreating] = useState(false);
 
-    const createRoom = async () => {
-        if (!createUserName.trim()) {
-
-            toast.error("Por favor ingresa tu nombre");
-            return;
-        }
-
-        setIsCreating(true);
-
-        try {
+    // --- useMutation: "Crear sala" ---
+    // mutate() ejecuta la petición; isLoading/error vienen automáticamente.
+    const createRoomMutation = useMutation({
+        mutationFn: async () => {
             let adminId = localStorage.getItem("adminId");
             if (!adminId) {
                 adminId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
                 localStorage.setItem("adminId", adminId);
             }
-
-            const response = await fetch("/api/rooms/create", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    adminName: createUserName.trim(),
-                    adminId, // Enviar el ID al servidor
-                }),
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                toast.error(data.error || "Error al crear la sala");
-                setIsCreating(false);
-                return;
-            }
-
-            // Guardar datos en localStorage
+            return apiCreateRoom(createUserName.trim(), adminId);
+        },
+        onSuccess: (data) => {
             localStorage.setItem("userName", createUserName.trim());
             localStorage.setItem("isAdmin", "true");
             localStorage.setItem("participantId", data.participantId);
@@ -62,36 +40,42 @@ export default function HomePage() {
                 `planning-poker-participant-${data.roomCode}`,
                 data.participantId,
             );
-
-            // Redirigir a la sala
             router.push(`/room/${data.roomCode}`);
-        } catch (err) {
-            toast.error("Error de conexión. Por favor intenta de nuevo.");
-            setIsCreating(false);
+        },
+        onError: (err) => {
+            toast.error(err instanceof Error ? err.message : "Error al crear la sala");
+        },
+    });
+
+    // --- useMutation: "Validar sala y redirigir a /join" ---
+    const validateAndGoToJoinMutation = useMutation({
+        mutationFn: () => validateRoom(roomCode.toUpperCase()),
+        onSuccess: (data) => {
+            if (data.exists) {
+                router.push(`/join/${roomCode.toUpperCase()}`);
+            } else {
+                toast.error("La sala no existe o ha sido cerrada");
+            }
+        },
+        onError: () => {
+            toast.error("Error al validar la sala. Por favor intenta de nuevo.");
+        },
+    });
+
+    const handleCreateRoom = () => {
+        if (!createUserName.trim()) {
+            toast.error("Por favor ingresa tu nombre");
+            return;
         }
+        createRoomMutation.mutate();
     };
 
-    const joinRoom = async () => {
+    const handleJoinRoom = () => {
         if (!roomCode.trim()) {
             toast.error("Por favor ingresa el código de la sala");
             return;
         }
-
-        try {
-            const response = await fetch(
-                `/api/rooms/${roomCode.toUpperCase()}/validate`,
-            );
-            const data = await response.json();
-
-            if (!data.exists) {
-                toast.error("La sala no existe o ha sido cerrada");
-                return;
-            }
-
-            router.push(`/join/${roomCode.toUpperCase()}`);
-        } catch (err) {
-            toast.error("Error al validar la sala. Por favor intenta de nuevo.");
-        }
+        validateAndGoToJoinMutation.mutate();
     };
 
     return (
@@ -136,16 +120,16 @@ export default function HomePage() {
                                         }
                                         className="bg-muted border-border text-foreground w-full shadow-none"
                                         onKeyDown={(e) =>
-                                            e.key === "Enter" && createRoom()
+                                            e.key === "Enter" && handleCreateRoom()
                                         }
                                     />
                                 </div>
                                 <Button
-                                    onClick={createRoom}
-                                    disabled={isCreating}
+                                    onClick={handleCreateRoom}
+                                    disabled={createRoomMutation.isPending}
                                     className="w-full bg-primary hover:bg-primary/90 dark:text-foreground text-primary-foreground font-medium transition-all cursor-pointer hover:shadow-sm hover:shadow-brand"
                                 >
-                                    {isCreating ? "Creando..." : "Crear Sala"}
+                                    {createRoomMutation.isPending ? "Creando..." : "Crear Sala"}
                                 </Button>
                             </CardContent>
                         </Card>
@@ -179,16 +163,17 @@ export default function HomePage() {
                                         }
                                         className="bg-muted border-border text-foreground w-full shadow-none"
                                         onKeyDown={(e) =>
-                                            e.key === "Enter" && joinRoom()
+                                            e.key === "Enter" && handleJoinRoom()
                                         }
                                     />
                                 </div>
                                 <Button
-                                    onClick={joinRoom}
+                                    onClick={handleJoinRoom}
+                                    disabled={validateAndGoToJoinMutation.isPending}
                                     variant="outline"
                                     className="w-full border-border hover:bg-muted bg-background font-medium transition-all cursor-pointer shadow-none"
                                 >
-                                    Unirse a Sala
+                                    {validateAndGoToJoinMutation.isPending ? "Comprobando..." : "Unirse a Sala"}
                                 </Button>
                             </CardContent>
                         </Card>

@@ -76,15 +76,14 @@ const StoryItem = memo(({ story, currentStoryId, isAdmin, onSelectStory, onDelet
 
 StoryItem.displayName = "StoryItem"
 
-function StoryManager({ room, isAdmin, onAddStory, onDeleteStory, onSelectStory }: { room: any, isAdmin: boolean, onAddStory: (title: string, description: string) => void, onDeleteStory: (id: string) => void, onSelectStory: (id: string) => void }) {
+function StoryManager({ room, isAdmin, onAddStory, onDeleteStory, onSelectStory, isAddingStory = false }: { room: any, isAdmin: boolean, onAddStory: (title: string, description: string) => void, onDeleteStory: (id: string) => void, onSelectStory: (id: string) => void, isAddingStory?: boolean }) {
   const [isCreating, setIsCreating] = useState(false)
   const [newTitle, setNewTitle] = useState("")
   const [newDescription, setNewDescription] = useState("")
 
-  const handleCreate = async () => {
-    if (!newTitle.trim()) return
-
-    await onAddStory(newTitle, newDescription)
+  const handleCreate = () => {
+    if (!newTitle.trim() || isAddingStory) return
+    onAddStory(newTitle, newDescription)
     setNewTitle("")
     setNewDescription("")
     setIsCreating(false)
@@ -104,6 +103,7 @@ function StoryManager({ room, isAdmin, onAddStory, onDeleteStory, onSelectStory 
         {isAdmin && !isCreating && (
           <Button
             onClick={() => setIsCreating(true)}
+            disabled={isAddingStory}
             size="sm"
             className="bg-primary hover:bg-primary/90 dark:text-foreground text-primary-foreground font-medium transition-all hover:shadow-md hover:scale-105 cursor-pointer"
           >
@@ -137,10 +137,11 @@ function StoryManager({ room, isAdmin, onAddStory, onDeleteStory, onSelectStory 
             <div className="flex gap-2">
               <Button
                 onClick={handleCreate}
+                disabled={isAddingStory}
                 size="sm"
                 className="bg-primary hover:bg-primary/90 dark:text-foreground text-primary-foreground font-medium transition-all hover:shadow-md hover:scale-105 cursor-pointer"
               >
-                Crear
+                {isAddingStory ? "Creando..." : "Crear"}
               </Button>
               <Button
                 onClick={() => {

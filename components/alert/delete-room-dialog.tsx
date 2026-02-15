@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { LogOut, Trash2Icon } from "lucide-react"
 
-export function AlertDialogDestructive({ action, description, title, triggerText, buttonText }: { action: () => void, description: string, title: string, triggerText: string, buttonText: string }) {
+export function AlertDialogDestructive({ action, description, title, triggerText, buttonText, isLoading }: { action: () => void, description: string, title: string, triggerText: string, buttonText: string, isLoading?: boolean }) {
     return (
         <AlertDialog>
             <AlertDialogTrigger asChild>
@@ -38,8 +38,10 @@ export function AlertDialogDestructive({ action, description, title, triggerText
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel variant="outline">Cancelar</AlertDialogCancel>
-                    <AlertDialogAction variant="destructive" onClick={action}>{triggerText}</AlertDialogAction>
+                    <AlertDialogCancel variant="outline" disabled={isLoading}>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction variant="destructive" onClick={action} disabled={isLoading}>
+                        {isLoading ? "Eliminando..." : buttonText}
+                    </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>

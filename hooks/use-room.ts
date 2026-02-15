@@ -1,6 +1,19 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { useMutation } from "@tanstack/react-query";
+import {
+    voteRoom,
+    revealRoom,
+    resetRoom,
+    addStoryRoom,
+    deleteStoryRoom,
+    selectStoryRoom,
+    setAdminModeRoom,
+    changeRoleRoom,
+    deleteRoom as deleteRoomApi,
+    removeParticipantRoom,
+} from "@/lib/api/rooms";
 
 // Type definitions
 export interface Participant {
@@ -46,15 +59,26 @@ export interface UseRoomReturn {
     isLoading: boolean;
     error: string | null;
     wasRemoved: boolean;
-    submitVote: (vote: string) => Promise<void>;
-    revealVotes: () => Promise<void>;
-    resetVotes: () => Promise<void>;
-    addStory: (title: string, description: string) => Promise<void>;
-    deleteStory: (storyId: string) => Promise<void>;
-    selectStory: (storyId: string) => Promise<void>;
-    setAdminMode: (mode: string) => Promise<void>;
-    changeRole: (role: string) => Promise<void>;
+    submitVote: (vote: string) => void;
+    revealVotes: () => void;
+    resetVotes: () => void;
+    isVoting: boolean;
+    isRevealing: boolean;
+    isResetting: boolean;
+    addStory: (title: string, description: string) => void;
+    deleteStory: (storyId: string) => void;
+    selectStory: (storyId: string) => void;
+    setAdminMode: (mode: string) => void;
+    changeRole: (role: string) => void;
     deleteRoomAndExit: () => Promise<boolean>;
+    removeParticipant: (participantIdToRemove: string) => void;
+    isAddingStory: boolean;
+    isDeletingStory: boolean;
+    isSelectingStory: boolean;
+    isSettingAdminMode: boolean;
+    isChangingRole: boolean;
+    isDeletingRoom: boolean;
+    isRemovingParticipant: boolean;
 }
 
 export function useRoom(
@@ -264,190 +288,112 @@ export function useRoom(
         }
     }, [room, participantId, isLoading]);
 
-    const submitVote = async (vote: string) => {
-        try {
-            const response = await fetch(`/api/rooms/${code}/vote`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ participantId, vote }),
-            });
+    const voteMutation = useMutation({
+        mutationFn: (vote: string) => voteRoom(code, participantId!, vote),
+        onSuccess: (data) => setRoom(data as Room),
+        onError: (err) => console.error("[useRoom] Error al votar:", err),
+    });
 
-            if (!response.ok) throw new Error("Error al enviar voto");
+    const revealMutation = useMutation({
+        mutationFn: () => revealRoom(code, participantId!),
+        onSuccess: (data) => setRoom(data as Room),
+        onError: (err) => console.error("[useRoom] Error al revelar:", err),
+    });
 
-            // Actualización optimista - actualizar inmediatamente sin esperar SSE
-            const data = await response.json();
-            setRoom(data);
-        } catch (err) {
-            console.error(err);
-        }
+    const resetMutation = useMutation({
+        mutationFn: () => resetRoom(code, participantId!),
+        onSuccess: (data) => setRoom(data as Room),
+        onError: (err) => console.error("[useRoom] Error al resetear:", err),
+    });
+
+    const submitVote = (vote: string) => {
+        if (participantId) voteMutation.mutate(vote);
     };
 
-    const revealVotes = async () => {
-        try {
-            const response = await fetch(`/api/rooms/${code}/reveal`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ participantId }),
-            });
-
-            if (!response.ok) throw new Error("Error al revelar votos");
-
-            // Actualización optimista - actualizar inmediatamente sin esperar SSE
-            const data = await response.json();
-            setRoom(data);
-        } catch (err) {
-            console.error(err);
-        }
+    const revealVotes = () => {
+        if (participantId) revealMutation.mutate();
     };
 
-    const resetVotes = async () => {
-        try {
-            const response = await fetch(`/api/rooms/${code}/reset`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ participantId }),
-            });
-
-            if (!response.ok) throw new Error("Error al resetear votos");
-
-            // Actualización optimista - actualizar inmediatamente sin esperar SSE
-            const data = await response.json();
-            setRoom(data);
-        } catch (err) {
-            console.error(err);
-        }
+    const resetVotes = () => {
+        if (participantId) resetMutation.mutate();
     };
 
-    const addStory = async (title: string, description: string) => {
-        try {
-            const response = await fetch(`/api/rooms/${code}/stories`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ title, description, participantId }),
-            });
+    const addStoryMutation = useMutation({
+        mutationFn: ({ title, description }: { title: string; description: string }) =>
+            addStoryRoom(code, participantId!, { title, description }),
+        onSuccess: (data) => setRoom(data as Room),
+        onError: (err) => console.error("[useRoom] Error al crear historia:", err),
+    });
 
-            if (!response.ok) throw new Error("Error al crear historia");
+    const deleteStoryMutation = useMutation({
+        mutationFn: (storyId: string) => deleteStoryRoom(code, participantId!, storyId),
+        onSuccess: (data) => setRoom(data as Room),
+        onError: (err) => console.error("[useRoom] Error al eliminar historia:", err),
+    });
 
-            // Actualización optimista - actualizar inmediatamente sin esperar SSE
-            const data = await response.json();
-            setRoom(data);
-        } catch (err) {
-            console.error(err);
-        }
+    const selectStoryMutation = useMutation({
+        mutationFn: (storyId: string) => selectStoryRoom(code, participantId!, storyId),
+        onSuccess: (data) => setRoom(data as Room),
+        onError: (err) => console.error("[useRoom] Error al seleccionar historia:", err),
+    });
+
+    const addStory = (title: string, description: string) => {
+        if (participantId) addStoryMutation.mutate({ title, description });
     };
 
-    const deleteStory = async (storyId: string) => {
-        try {
-            const response = await fetch(
-                `/api/rooms/${code}/stories/${storyId}?participantId=${participantId}`,
-                {
-                    method: "DELETE",
-                },
-            );
-
-            if (!response.ok) throw new Error("Error al eliminar historia");
-
-            // Actualización optimista - actualizar inmediatamente sin esperar SSE
-            const data = await response.json();
-            setRoom(data);
-        } catch (err) {
-            console.error(err);
-        }
+    const deleteStory = (storyId: string) => {
+        if (participantId) deleteStoryMutation.mutate(storyId);
     };
 
-    const selectStory = async (storyId: string) => {
-        try {
-            const response = await fetch(
-                `/api/rooms/${code}/stories/${storyId}/select`,
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ participantId }),
-                },
-            );
-
-            if (!response.ok) throw new Error("Error al seleccionar historia");
-
-            // Actualización optimista - actualizar inmediatamente sin esperar SSE
-            const data = await response.json();
-            setRoom(data);
-        } catch (err) {
-            console.error(err);
-        }
+    const selectStory = (storyId: string) => {
+        if (participantId) selectStoryMutation.mutate(storyId);
     };
 
-    const setAdminMode = async (mode: string) => {
-        try {
-            const response = await fetch(`/api/rooms/${code}/admin-mode`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ participantId, mode }),
-            });
+    const setAdminModeMutation = useMutation({
+        mutationFn: (mode: string) => setAdminModeRoom(code, participantId!, mode),
+        onSuccess: (data) => setRoom(data as Room),
+        onError: (err) => console.error("[useRoom] Error al cambiar modo:", err),
+    });
 
-            if (!response.ok) throw new Error("Error al cambiar modo");
-
-            // Actualización optimista - actualizar inmediatamente sin esperar SSE
-            const data = await response.json();
-            setRoom(data);
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
-    const changeRole = async (role: string) => {
-        try {
-            const response = await fetch(
-                `/api/rooms/${code}/participants/${participantId}/role`,
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ role }),
-                },
-            );
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error("[useRoom] Error al cambiar rol:", errorData);
-                throw new Error(errorData.error || "Error al cambiar rol");
-            }
-
-            // Actualización optimista - actualizar inmediatamente sin esperar SSE
-            const data = await response.json();
-            setRoom(data.room);
-
-            // Guardar el rol en localStorage para persistencia
+    const changeRoleMutation = useMutation({
+        mutationFn: (role: string) => changeRoleRoom(code, participantId!, role),
+        onSuccess: (data, role) => {
+            setRoom(data.room as Room);
             localStorage.setItem(`planning-poker-role-${code}`, role);
-        } catch (err) {
-            console.error("[useRoom] Error en changeRole:", err);
-            throw err;
-        }
-    };
+        },
+        onError: (err) => console.error("[useRoom] Error al cambiar rol:", err),
+    });
 
-    const deleteRoomAndExit = async (): Promise<boolean> => {
-        try {
-            const response = await fetch(
-                `/api/rooms/${code}/delete?participantId=${participantId}`,
-                {
-                    method: "DELETE",
-                },
-            );
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error("[useRoom] Error al eliminar sala:", errorData);
-                throw new Error(errorData.error || "Error al eliminar sala");
-            }
-
-            // Limpiar localStorage
+    const deleteRoomMutation = useMutation({
+        mutationFn: () => deleteRoomApi(code, participantId!),
+        onSuccess: () => {
             localStorage.removeItem("participantId");
             localStorage.removeItem(`planning-poker-participant-${code}`);
             localStorage.removeItem(`planning-poker-role-${code}`);
+        },
+        onError: (err) => console.error("[useRoom] Error al eliminar sala:", err),
+    });
 
-            return true;
-        } catch (err) {
-            console.error("[useRoom] Error en deleteRoomAndExit:", err);
-            throw err;
-        }
+    const removeParticipantMutation = useMutation({
+        mutationFn: (participantIdToRemove: string) =>
+            removeParticipantRoom(code, participantIdToRemove, participantId!),
+        onSuccess: (data) => setRoom(data as Room),
+        onError: (err) => console.error("[useRoom] Error al eliminar participante:", err),
+    });
+
+    const setAdminMode = (mode: string) => {
+        if (participantId) setAdminModeMutation.mutate(mode);
+    };
+
+    const changeRole = (role: string) => {
+        if (participantId) changeRoleMutation.mutate(role);
+    };
+
+    const deleteRoomAndExit = (): Promise<boolean> =>
+        deleteRoomMutation.mutateAsync().then(() => true);
+
+    const removeParticipant = (participantIdToRemove: string) => {
+        if (participantId) removeParticipantMutation.mutate(participantIdToRemove);
     };
 
     return {
@@ -459,11 +405,22 @@ export function useRoom(
         submitVote,
         revealVotes,
         resetVotes,
+        isVoting: voteMutation.isPending,
+        isRevealing: revealMutation.isPending,
+        isResetting: resetMutation.isPending,
         addStory,
         deleteStory,
         selectStory,
         setAdminMode,
         changeRole,
         deleteRoomAndExit,
+        removeParticipant,
+        isAddingStory: addStoryMutation.isPending,
+        isDeletingStory: deleteStoryMutation.isPending,
+        isSelectingStory: selectStoryMutation.isPending,
+        isSettingAdminMode: setAdminModeMutation.isPending,
+        isChangingRole: changeRoleMutation.isPending,
+        isDeletingRoom: deleteRoomMutation.isPending,
+        isRemovingParticipant: removeParticipantMutation.isPending,
     };
 }

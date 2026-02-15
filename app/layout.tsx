@@ -8,6 +8,7 @@ import './globals.css'
 import { Manrope as V0_Font_Manrope, Space_Mono as V0_Font_Space_Mono, Source_Serif_4 as V0_Font_Source_Serif_4 } from 'next/font/google'
 import { Toaster } from 'sonner'
 import { ThemeProvider } from '@/components/theme-provider'
+import { QueryProvider } from '@/components/providers/query-provider'
 
 // Initialize fonts
 const _manrope = V0_Font_Manrope({ subsets: ['latin'], weight: ["200", "300", "400", "500", "600", "700", "800"], variable: '--v0-font-manrope' })
@@ -32,6 +33,7 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <body suppressHydrationWarning className={`font-sans ${GeistSans.variable} ${GeistMono.variable} ${_v0_fontVariables}`}>
+        <QueryProvider>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -42,6 +44,7 @@ export default function RootLayout({
           <Toaster position='top-center' richColors />
           <Analytics />
         </ThemeProvider>
+        </QueryProvider>
       </body>
     </html>
   )

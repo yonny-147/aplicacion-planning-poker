@@ -9,7 +9,7 @@ import { RotateCcw, Eye } from "lucide-react"
 const FIBONACCI_VALUES = ["0", "1", "2", "3", "4", "5", "8", "13", "?", "coffee"]
 const ROLES_FOR_AVERAGE = ["QA", "DEV"]
 
-function VotingArea({ isAdmin, userName, room, participantId, onVote, onReveal, onReset }: { isAdmin: boolean, userName: string, room: any, participantId: string, onVote: (vote: string) => void, onReveal: () => void, onReset: () => void }) {
+function VotingArea({ isAdmin, userName, room, participantId, onVote, onReveal, onReset, isVoting = false, isRevealing = false, isResetting = false }: { isAdmin: boolean, userName: string, room: any, participantId: string, onVote: (vote: string) => void, onReveal: () => void, onReset: () => void, isVoting?: boolean, isRevealing?: boolean, isResetting?: boolean }) {
   const [selectedVote, setSelectedVote] = useState<string | null>(null)
   const [adminMode, setAdminMode] = useState("facilitator")
 
@@ -176,22 +176,24 @@ function VotingArea({ isAdmin, userName, room, participantId, onVote, onReveal, 
               {allVoted && !isRevealed && (
                 <Button
                   onClick={onReveal}
+                  disabled={isRevealing}
                   size="sm"
                   className="bg-primary hover:bg-primary/90 text-white font-medium transition-all hover:shadow-md hover:scale-105 cursor-pointer"
                 >
                   <Eye className="w-4 h-4 mr-2" />
-                  Revelar Votos
+                  {isRevealing ? "Revelando..." : "Revelar Votos"}
                 </Button>
               )}
               {isRevealed && (
                 <Button
                   onClick={onReset}
+                  disabled={isResetting}
                   size="sm"
                   variant="outline"
                   className="border-border hover:bg-muted bg-transparent font-medium transition-all hover:shadow-sm cursor-pointer"
                 >
                   <RotateCcw className="w-4 h-4 mr-2" />
-                  Resetear
+                  {isResetting ? "Reseteando..." : "Resetear"}
                 </Button>
               )}
             </div>
@@ -264,16 +266,16 @@ function VotingArea({ isAdmin, userName, room, participantId, onVote, onReveal, 
                   isSelected={selectedVote === value}
                   onSelect={handleVote}
                   isRevealed={isRevealed}
-                  isDisabled={isRevealed}
+                  isDisabled={isRevealed || isVoting}
                 />
               ))}
             </div>
 
             {selectedVote && !isRevealed && (
               <div className="mt-6 text-center">
-                <p className="text-primary font-medium">Tu voto ha sido registrado</p>
+                <p className="text-primary font-medium">{isVoting ? "Enviando voto..." : "Tu voto ha sido registrado"}</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Esperando a que {allVoted ? "el administrador revele" : "todos voten"}...
+                  {isVoting ? "Espera un momento..." : `Esperando a que ${allVoted ? "el administrador revele" : "todos voten"}...`}
                 </p>
               </div>
             )}

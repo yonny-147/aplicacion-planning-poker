@@ -1,130 +1,102 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useParams, useRouter, useSearchParams } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { AlertCircle, Users } from "lucide-react"
+import { useState } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { AlertCircle, Users } from "lucide-react";
+import { queryKeys } from "@/lib/query-keys";
+import { validateRoom, joinRoom } from "@/lib/api/rooms";
+
+const MAX_JOIN_ATTEMPTS = 3;
 
 export default function JoinRoomPage() {
-  const params = useParams()
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const roomCode = params.code
+  const params = useParams();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const roomCode = (params.code as string) ?? "";
 
-  const [userName, setUserName] = useState(searchParams.get("name") || "")
-  const [role, setRole] = useState("")
-  const [isLoading, setIsLoading] = useState(true)
-  const [isJoining, setIsJoining] = useState(false)
-  const [roomExists, setRoomExists] = useState(false)
-  const [participantCount, setParticipantCount] = useState(0)
-  const [error, setError] = useState("")
+  const [userName, setUserName] = useState(searchParams.get("name") || "");
+  const [role, setRole] = useState("");
+  const [error, setError] = useState("");
 
-  useEffect(() => {
-    validateRoom()
-  }, [roomCode])
+  // --- useQuery: validar sala al montar la página ---
+  // Se ejecuta automáticamente cuando roomCode está definido.
+  // data = resultado de validateRoom(); isLoading / isError / refetch también disponibles.
+  const {
+    data: validateData,
+    isLoading: isValidating,
+    isError: isValidateError,
+  } = useQuery({
+    queryKey: queryKeys.roomValidate(roomCode),
+    queryFn: () => validateRoom(roomCode),
+    enabled: !!roomCode,
+  });
 
-  const validateRoom = async () => {
-    try {
-      const response = await fetch(`/api/rooms/${roomCode}/validate`)
-      const data = await response.json()
+  const roomExists = !!validateData?.exists;
+  const participantCount = validateData?.participantCount ?? 0;
 
-      if (data.exists) {
-        setRoomExists(true)
-        setParticipantCount(data.participantCount)
-      } else {
-        setRoomExists(false)
+  // --- useMutation: unirse a la sala (reintentos si el nombre está en uso, 409) ---
+  const joinMutationSimple = useMutation({
+    mutationFn: async () => {
+      let participantId = localStorage.getItem(`planning-poker-participant-${roomCode}`);
+      if (!participantId) {
+        participantId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
       }
-    } catch (err) {
-      setRoomExists(false)
-    } finally {
-      setIsLoading(false)
-    }
-  }
+      const baseName = userName.trim();
+      let currentName = baseName;
 
-  const handleJoin = async () => {
+      for (let attempt = 0; attempt < MAX_JOIN_ATTEMPTS; attempt++) {
+        try {
+          const data = await joinRoom(roomCode, {
+            participantName: currentName,
+            participantId,
+            role,
+          });
+          return { ...data, actualName: currentName };
+        } catch (err: unknown) {
+          const e = err as Error & { status?: number };
+          if (e.status === 409 && attempt < MAX_JOIN_ATTEMPTS - 1) {
+            const suffix = Math.floor(Math.random() * 900) + 100;
+            currentName = `${baseName}-${suffix}`;
+            setUserName(currentName);
+            continue;
+          }
+          throw e;
+        }
+      }
+      throw new Error("Error al unirse a la sala");
+    },
+    onSuccess: (data) => {
+      const nameToSave = "actualName" in data && typeof data.actualName === "string" ? data.actualName : userName.trim();
+      localStorage.setItem("userName", nameToSave);
+      localStorage.setItem("isAdmin", "false");
+      localStorage.setItem("participantId", data.participantId);
+      localStorage.setItem(`planning-poker-participant-${roomCode}`, data.participantId);
+      localStorage.setItem(`planning-poker-role-${roomCode}`, role);
+      router.push(`/room/${roomCode}`);
+    },
+    onError: (err) => {
+      setError(err instanceof Error ? err.message : "Error al unirse a la sala");
+    },
+  });
+
+  const handleJoinSubmit = () => {
     if (!userName.trim()) {
-      setError("Por favor ingresa tu nombre")
-      return
+      setError("Por favor ingresa tu nombre");
+      return;
     }
     if (!role) {
-      setError("Por favor selecciona tu rol")
-      return
+      setError("Por favor selecciona tu rol");
+      return;
     }
+    setError("");
+    joinMutationSimple.mutate();
+  };
 
-    setIsJoining(true)
-    setError("")
-
-    try {
-      const maxAttempts = 3
-      let attempt = 0
-      let finalData = null
-      let participantId = localStorage.getItem(`planning-poker-participant-${roomCode}`)
-
-      const baseName = userName.trim()
-
-      while (attempt < maxAttempts) {
-        if (!participantId) {
-          participantId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
-        }
-
-        const response = await fetch(`/api/rooms/${roomCode}/join`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            participantName: userName.trim(),
-            participantId, // Enviar el ID al servidor
-            role,
-          }),
-        })
-
-        const data = await response.json()
-
-        if (response.ok) {
-          finalData = data
-          break
-        }
-
-        // Si el nombre está en uso, intentar una alternativa (solo hasta maxAttempts)
-        if (response.status === 409) {
-          attempt += 1
-          if (attempt >= maxAttempts) {
-            setError(data.error || "El nombre ya está en uso. Por favor elige otro nombre.")
-            setIsJoining(false)
-            return
-          }
-          // Generar nombre alternativo simple
-          const suffix = Math.floor(Math.random() * 900) + 100
-          const altName = `${baseName}-${suffix}`
-          setUserName(altName)
-          // Continuar con el mismo participantId (o regenerarlo?) — mantener para este intento
-          continue
-        }
-
-        // Otros errores
-        setError(data.error || "Error al unirse a la sala")
-        setIsJoining(false)
-        return
-      }
-
-      const data = finalData
-
-      localStorage.setItem("userName", userName.trim())
-      localStorage.setItem("isAdmin", "false")
-      localStorage.setItem("participantId", data.participantId)
-      localStorage.setItem(`planning-poker-participant-${roomCode}`, data.participantId)
-      localStorage.setItem(`planning-poker-role-${roomCode}`, role)
-
-      // Redirigir a la sala
-      router.push(`/room/${roomCode}`)
-    } catch (err) {
-      setError("Error de conexión. Por favor intenta de nuevo.")
-      setIsJoining(false)
-    }
-  }
-
-  if (isLoading) {
+  if (isValidating) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
@@ -132,10 +104,10 @@ export default function JoinRoomPage() {
           <p className="text-muted-foreground">Verificando sala...</p>
         </div>
       </div>
-    )
+    );
   }
 
-  if (!roomExists) {
+  if (isValidateError || !roomExists) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <Card className="w-full max-w-md border-destructive">
@@ -144,7 +116,7 @@ export default function JoinRoomPage() {
               <AlertCircle className="h-5 w-5" />
               <CardTitle>Sala no encontrada</CardTitle>
             </div>
-            <CardDescription>La sala con código "{roomCode}" no existe o ha sido cerrada.</CardDescription>
+            <CardDescription>La sala con código &quot;{roomCode}&quot; no existe o ha sido cerrada.</CardDescription>
           </CardHeader>
           <CardContent>
             <Button onClick={() => router.push("/")} className="w-full bg-primary text-foreground hover:bg-primary/90 cursor-pointer">
@@ -153,7 +125,7 @@ export default function JoinRoomPage() {
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
 
   return (
@@ -186,21 +158,21 @@ export default function JoinRoomPage() {
               placeholder="Ingresa tu nombre"
               value={userName}
               onChange={(e) => setUserName(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleJoin()}
+              onKeyDown={(e) => e.key === "Enter" && handleJoinSubmit()}
               className="bg-muted border-border text-foreground"
-              disabled={isJoining}
+              disabled={joinMutationSimple.isPending}
               autoFocus
             />
             <div className="mt-4">
               <label className="block mb-2 text-sm font-medium">Selecciona tu rol:</label>
               <div className="flex gap-4">
-                <Button variant={role === "QA" ? "default" : "outline"} className="cursor-pointer dark:text-foreground" onClick={() => setRole("QA")} disabled={isJoining}>
+                <Button variant={role === "QA" ? "default" : "outline"} className="cursor-pointer dark:text-foreground" onClick={() => setRole("QA")} disabled={joinMutationSimple.isPending}>
                   QA
                 </Button>
-                <Button variant={role === "DEV" ? "default" : "outline"} className="cursor-pointer dark:text-foreground" onClick={() => setRole("DEV")} disabled={isJoining}>
+                <Button variant={role === "DEV" ? "default" : "outline"} className="cursor-pointer dark:text-foreground" onClick={() => setRole("DEV")} disabled={joinMutationSimple.isPending}>
                   DEV
                 </Button>
-                <Button variant={role === "facilitator" ? "default" : "outline"} className="cursor-pointer dark:text-foreground" onClick={() => setRole("facilitator")} disabled={isJoining}>
+                <Button variant={role === "facilitator" ? "default" : "outline"} className="cursor-pointer dark:text-foreground" onClick={() => setRole("facilitator")} disabled={joinMutationSimple.isPending}>
                   Facilitador
                 </Button>
               </div>
@@ -214,18 +186,18 @@ export default function JoinRoomPage() {
           </div>
 
           <Button
-            onClick={handleJoin}
-            disabled={isJoining || !userName.trim() || !role}
+            onClick={handleJoinSubmit}
+            disabled={joinMutationSimple.isPending || !userName.trim() || !role}
             className="w-full bg-primary hover:bg-primary/90 dark:text-foreground text-primary-foreground cursor-pointer"
           >
-            {isJoining ? "Uniéndose..." : "Unirse a la sala"}
+            {joinMutationSimple.isPending ? "Uniéndose..." : "Unirse a la sala"}
           </Button>
 
-          <Button onClick={() => router.push("/")} variant="outline" className="w-full cursor-pointer" disabled={isJoining}>
+          <Button onClick={() => router.push("/")} variant="outline" className="w-full cursor-pointer" disabled={joinMutationSimple.isPending}>
             Cancelar
           </Button>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

@@ -44,12 +44,19 @@ export default function RoomPage() {
     submitVote,
     revealVotes,
     resetVotes,
+    isVoting,
+    isRevealing,
+    isResetting,
     addStory,
     deleteStory,
     selectStory,
     setAdminMode,
     changeRole,
     deleteRoomAndExit,
+    removeParticipant,
+    isAddingStory,
+    isDeletingRoom,
+    isRemovingParticipant,
   } = useRoom(roomCode, userName)
 
   useEffect(() => {
@@ -107,18 +114,8 @@ export default function RoomPage() {
     )
   }
 
-  // Función para eliminar participante
-  const handleRemoveParticipant = async (participantIdToRemove: string) => {
-    if (!participantIdToRemove || !participantId) return
-    try {
-      await fetch(`/api/rooms/${roomCode}/participants/${participantIdToRemove}/delete`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ adminId: participantId }),
-      })
-    } catch (err) {
-      // Puedes mostrar un toast de error si lo deseas
-    }
+  const handleRemoveParticipant = (participantIdToRemove: string) => {
+    removeParticipant(participantIdToRemove)
   }
 
   // Función para eliminar la sala completa
@@ -159,6 +156,9 @@ export default function RoomPage() {
               onVote={submitVote}
               onReveal={revealVotes}
               onReset={resetVotes}
+              isVoting={isVoting}
+              isRevealing={isRevealing}
+              isResetting={isResetting}
             />
 
             <StoryManager
@@ -167,6 +167,7 @@ export default function RoomPage() {
               onAddStory={addStory}
               onDeleteStory={deleteStory}
               onSelectStory={selectStory}
+              isAddingStory={isAddingStory}
             />
 
             <VotedStoriesHistory room={room} />
@@ -179,6 +180,7 @@ export default function RoomPage() {
                 participantId={participantId as string}
                 onSetAdminMode={setAdminMode}
                 onDeleteRoom={handleDeleteRoom}
+                isDeletingRoom={isDeletingRoom}
               />
             )}
 
@@ -187,6 +189,7 @@ export default function RoomPage() {
               participants={room?.participants || []}
               isAdmin={isAdmin}
               onRemoveParticipant={handleRemoveParticipant}
+              isRemovingParticipant={isRemovingParticipant}
             />
           </div>
         </div>
