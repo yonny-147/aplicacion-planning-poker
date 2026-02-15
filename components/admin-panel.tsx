@@ -88,7 +88,7 @@ export default function AdminPanel({ room, participantId, onSetAdminMode, onDele
                 <Users className="w-4 h-4 text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">Participantes</span>
               </div>
-              <p className="text-2xl font-bold">{totalParticipants}</p>
+              <p className="text-2xl font-bold text-center">{totalParticipants}</p>
             </div>
 
             <div className="p-4 bg-muted rounded-lg">
@@ -96,7 +96,7 @@ export default function AdminPanel({ room, participantId, onSetAdminMode, onDele
                 <FileText className="w-4 h-4 text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">Historias Activas</span>
               </div>
-              <p className="text-2xl font-bold">
+              <p className="text-2xl font-bold text-center">
                 {activeStories}
               </p>
               <p className="text-xs text-muted-foreground mt-1">

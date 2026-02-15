@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, Check, Clock, Eye } from "lucide-react"
 
 
-const ParticipantItem = memo(function ParticipantItem({ participant, isAdmin, onRemove, isRemoving }: { participant: any, isAdmin: boolean, onRemove: (id: string) => void, isRemoving?: boolean }) {
+const ParticipantItem = memo(function ParticipantItem({ participant, isAdmin, onRemove, isRemoving, compact }: { participant: any, isAdmin: boolean, onRemove: (id: string) => void, isRemoving?: boolean, compact?: boolean }) {
   const isFacilitator = (participant.isAdmin && participant.adminMode === "facilitator") ||
     (participant.role && participant.role.toUpperCase() === "FACILITATOR")
 
@@ -18,38 +18,41 @@ const ParticipantItem = memo(function ParticipantItem({ participant, isAdmin, on
     return roleLabels[role?.toUpperCase() as keyof typeof roleLabels] || null
   }
 
+  const padding = compact ? "px-2 py-1.5" : "p-3"
+  const textSize = compact ? "text-xs" : "text-sm"
+
   return (
-    <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
-      <div className="flex items-center gap-2">
+    <div className={`flex items-center justify-between gap-1 rounded-lg bg-muted ${padding}`}>
+      <div className="flex items-center gap-1.5 min-w-0">
         <div
-          className={`w-2 h-2 rounded-full ${isFacilitator ? "bg-blue-500" : participant.hasVoted ? "bg-primary" : "bg-muted-foreground"
-            }`}
+          className={`shrink-0 w-1.5 h-1.5 rounded-full ${isFacilitator ? "bg-blue-500" : participant.hasVoted ? "bg-primary" : "bg-muted-foreground"}`}
         />
-        <span className="text-sm font-medium">
+        <span className={`font-medium truncate ${textSize}`}>
           {participant.name}
           {participant.isAdmin && (
-            <span className="ml-2 text-xs text-muted-foreground">(Admin)</span>
+            <span className="ml-1 text-[10px] text-muted-foreground">(Admin)</span>
           )}
           {participant.role && (
-            <span className="ml-2 px-2 py-0.5 text-xs bg-red-400/10 text-red-400 rounded">
+            <span className={compact ? "ml-1 text-[10px] text-muted-foreground" : "ml-1 px-1.5 py-0.5 text-[10px] bg-red-400/10 text-red-400 rounded"}>
               {getRoleLabel(participant.role)}
             </span>
           )}
         </span>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1 shrink-0">
         {isFacilitator ? (
-          <Eye className="w-4 h-4 text-blue-500" />
+          <Eye className="w-3.5 h-3.5 text-blue-500" />
         ) : participant.hasVoted ? (
-          <Check className="w-4 h-4 text-accent" />
+          <Check className="w-3.5 h-3.5 text-accent" />
         ) : (
-          <Clock className="w-4 h-4 text-muted-foreground" />
+          <Clock className="w-3.5 h-3.5 text-muted-foreground" />
         )}
         {isAdmin && !participant.isAdmin && onRemove && (
           <button
-            className="ml-2 px-2 py-1 text-xs bg-transparent border border-destructive text-destructive rounded hover:bg-destructive/10 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-1.5 py-0.5 text-[10px] bg-transparent border border-destructive text-destructive rounded hover:bg-destructive/10 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={() => onRemove(participant.id)}
             disabled={isRemoving}
+            title="Eliminar participante"
           >
             {isRemoving ? "..." : "Eliminar"}
           </button>
@@ -58,7 +61,6 @@ const ParticipantItem = memo(function ParticipantItem({ participant, isAdmin, on
     </div>
   )
 }, (prevProps, nextProps) => {
-  // Comparación personalizada para forzar actualización cuando cambien propiedades relevantes
   return (
     prevProps.participant.id === nextProps.participant.id &&
     prevProps.participant.name === nextProps.participant.name &&
@@ -67,12 +69,13 @@ const ParticipantItem = memo(function ParticipantItem({ participant, isAdmin, on
     prevProps.participant.adminMode === nextProps.participant.adminMode &&
     prevProps.participant.isAdmin === nextProps.participant.isAdmin &&
     prevProps.isAdmin === nextProps.isAdmin &&
-    prevProps.isRemoving === nextProps.isRemoving
+    prevProps.isRemoving === nextProps.isRemoving &&
+    prevProps.compact === nextProps.compact
   )
 })
 ParticipantItem.displayName = "ParticipantItem"
 
-function ParticipantsList({ userName, participants = [], isAdmin = false, onRemoveParticipant, isRemovingParticipant = false }: { userName: string, participants: any[], isAdmin: boolean, onRemoveParticipant: (id: string) => void, isRemovingParticipant?: boolean }) {
+function ParticipantsList({ userName, participants = [], isAdmin = false, onRemoveParticipant, isRemovingParticipant = false, variant = "default" }: { userName: string, participants: any[], isAdmin: boolean, onRemoveParticipant: (id: string) => void, isRemovingParticipant?: boolean, variant?: "default" | "sidebar" }) {
   // Fuerza re-render cuando cambian profundamente los participantes (aunque no cambie la referencia)
   const [, force] = useState(0)
   const lastSnapshotRef = useRef("")
@@ -103,6 +106,37 @@ function ParticipantsList({ userName, participants = [], isAdmin = false, onRemo
   })
 
   const votedCount = votingParticipants.filter((p) => p.hasVoted).length
+  const isSidebar = variant === "sidebar"
+
+  if (isSidebar) {
+    return (
+      <Card className="bg-card border-0 rounded-none shadow-none">
+        <CardHeader className="py-3 px-4 border-b border-border">
+          <CardTitle className="flex items-center gap-2 text-sm">
+            <Users className="w-4 h-4" />
+            Participantes ({participantsArray.length})
+          </CardTitle>
+          <div className="text-xs text-muted-foreground">
+            {votedCount} de {votingParticipants.length} han votado
+          </div>
+        </CardHeader>
+        <CardContent className="py-2 px-3">
+          <div className="space-y-1">
+            {participantsArray.map((participant) => (
+              <ParticipantItem
+                key={`${participant.id}-${participant.role}-${participant.hasVoted}-${participant.adminMode}-${participant.isAdmin}`}
+                participant={participant}
+                isAdmin={isAdmin}
+                onRemove={onRemoveParticipant}
+                isRemoving={isRemovingParticipant}
+                compact
+              />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
 
   return (
     <Card className="bg-card border-border sticky top-4">

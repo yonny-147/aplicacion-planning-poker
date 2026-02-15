@@ -145,9 +145,23 @@ export default function RoomPage() {
         onChangeRole={changeRole}
       />
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid lg:grid-cols-4 gap-6">
-          <div className="lg:col-span-3 space-y-6">
+      {/* Desktop: 3 columnas — Participantes | Centro (historias/votación) | Admin. Un solo scroll de página. */}
+      <div className="hidden lg:flex">
+        {/* Columna izquierda: Participantes */}
+        <aside className="w-64 xl:w-72 shrink-0 border-r border-border bg-muted/30">
+          <ParticipantsList
+            userName={userName}
+            participants={room?.participants || []}
+            isAdmin={isAdmin}
+            onRemoveParticipant={handleRemoveParticipant}
+            isRemovingParticipant={isRemovingParticipant}
+            variant="sidebar"
+          />
+        </aside>
+
+        {/* Columna central: Historias y votación */}
+        <main className="flex-1 min-w-0">
+          <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
             <VotingArea
               isAdmin={isAdmin}
               userName={userName}
@@ -172,27 +186,65 @@ export default function RoomPage() {
 
             <VotedStoriesHistory room={room} />
           </div>
+        </main>
 
-          <div className="lg:col-span-1 space-y-6">
-            {isAdmin && (
-              <AdminPanel
-                room={room}
-                participantId={participantId as string}
-                onSetAdminMode={setAdminMode}
-                onDeleteRoom={handleDeleteRoom}
-                isDeletingRoom={isDeletingRoom}
-              />
-            )}
-
-            <ParticipantsList
-              userName={userName}
-              participants={room?.participants || []}
-              isAdmin={isAdmin}
-              onRemoveParticipant={handleRemoveParticipant}
-              isRemovingParticipant={isRemovingParticipant}
+        {/* Columna derecha: Panel de administrador */}
+        <aside className="w-72 xl:w-80 shrink-0 border-l border-border bg-muted/30">
+          {isAdmin ? (
+            <AdminPanel
+              room={room}
+              participantId={participantId as string}
+              onSetAdminMode={setAdminMode}
+              onDeleteRoom={handleDeleteRoom}
+              isDeletingRoom={isDeletingRoom}
             />
-          </div>
-        </div>
+          ) : (
+            <div className="p-4 text-sm text-muted-foreground">
+              Panel visible solo para el administrador de la sala.
+            </div>
+          )}
+        </aside>
+      </div>
+
+      {/* Móvil: contenido apilado */}
+      <div className="lg:hidden container mx-auto px-4 py-6 space-y-6">
+        <ParticipantsList
+          userName={userName}
+          participants={room?.participants || []}
+          isAdmin={isAdmin}
+          onRemoveParticipant={handleRemoveParticipant}
+          isRemovingParticipant={isRemovingParticipant}
+        />
+        <VotingArea
+          isAdmin={isAdmin}
+          userName={userName}
+          room={room}
+          participantId={participantId as string}
+          onVote={submitVote}
+          onReveal={revealVotes}
+          onReset={resetVotes}
+          isVoting={isVoting}
+          isRevealing={isRevealing}
+          isResetting={isResetting}
+        />
+        <StoryManager
+          room={room}
+          isAdmin={isAdmin}
+          onAddStory={addStory}
+          onDeleteStory={deleteStory}
+          onSelectStory={selectStory}
+          isAddingStory={isAddingStory}
+        />
+        <VotedStoriesHistory room={room} />
+        {isAdmin && (
+          <AdminPanel
+            room={room}
+            participantId={participantId as string}
+            onSetAdminMode={setAdminMode}
+            onDeleteRoom={handleDeleteRoom}
+            isDeletingRoom={isDeletingRoom}
+          />
+        )}
       </div>
     </div>
   )
