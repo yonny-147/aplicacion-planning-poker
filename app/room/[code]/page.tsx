@@ -1,7 +1,8 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
+import { useMutation } from "@tanstack/react-query"
 
 import RoomHeader from "@/components/room-header"
 import VotingArea from "@/components/voting-area"
@@ -21,19 +22,13 @@ export default function RoomPage() {
   const [mounted, setMounted] = useState(false)
 
   // Leer userName ANTES de cualquier cosa para evitar cambios que causen re-renders
-  const [userName, setUserName] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem("userName") || ""
-    }
-    return ""
-  })
+  const userName = useRef(
+    typeof window !== 'undefined' ? localStorage.getItem("userName") || "" : ""
+  ).current
 
-  const [isAdmin, setIsAdmin] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem("isAdmin") === "true"
-    }
-    return false
-  })
+  const isAdmin = useRef(
+    typeof window !== 'undefined' ? localStorage.getItem("isAdmin") === "true" : false
+  ).current
 
   const {
     room,
@@ -51,6 +46,28 @@ export default function RoomPage() {
     changeRole,
     deleteRoomAndExit,
   } = useRoom(roomCode, userName)
+
+  const removeParticipantMutation = useMutation({
+    mutationFn: async (participantIdToRemove: string) => {
+      const response = await fetch(
+        `/api/rooms/${roomCode}/participants/${participantIdToRemove}/delete`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ adminId: participantId }),
+        }
+      )
+      if (!response.ok) throw new Error("Error al eliminar participante")
+    },
+    onError: () => {
+      toast.error("No se pudo eliminar al participante")
+    },
+  })
+
+  const handleRemoveParticipant = (participantIdToRemove: string) => {
+    if (!participantIdToRemove || !participantId) return
+    removeParticipantMutation.mutate(participantIdToRemove)
+  }
 
   useEffect(() => {
     setMounted(true)
@@ -73,7 +90,7 @@ export default function RoomPage() {
 
       // Mostrar notificación
       toast.error("Eliminado de la sala", {
-        description: "Has sido eliminado de la sala por el administrador.",
+        description: "Has sido eliminado de la sala o la sala fue eliminada por el administrador.",
       })
 
       // Redirigir a la página principal después de un breve momento
@@ -105,20 +122,6 @@ export default function RoomPage() {
         </div>
       </div>
     )
-  }
-
-  // Función para eliminar participante
-  const handleRemoveParticipant = async (participantIdToRemove: string) => {
-    if (!participantIdToRemove || !participantId) return
-    try {
-      await fetch(`/api/rooms/${roomCode}/participants/${participantIdToRemove}/delete`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ adminId: participantId }),
-      })
-    } catch (err) {
-      // Puedes mostrar un toast de error si lo deseas
-    }
   }
 
   // Función para eliminar la sala completa
