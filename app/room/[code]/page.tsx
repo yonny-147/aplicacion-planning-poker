@@ -153,7 +153,16 @@ export default function RoomPage() {
 
       <div className="container mx-auto px-4 py-8">
         <div className="grid lg:grid-cols-4 gap-6">
-          <div className="lg:col-span-3 space-y-6">
+          <div className="lg:col-span-1">
+            <ParticipantsList
+              userName={userName}
+              participants={room?.participants || []}
+              isAdmin={isAdmin}
+              onRemoveParticipant={handleRemoveParticipant}
+            />
+          </div>
+
+          <div className="lg:col-span-2 space-y-6">
             <VotingArea
               isAdmin={isAdmin}
               userName={userName}
@@ -175,7 +184,7 @@ export default function RoomPage() {
             <VotedStoriesHistory room={room} />
           </div>
 
-          <div className="lg:col-span-1 space-y-6">
+          <div className="lg:col-span-1">
             {isAdmin && (
               <AdminPanel
                 room={room}
@@ -184,13 +193,6 @@ export default function RoomPage() {
                 onDeleteRoom={handleDeleteRoom}
               />
             )}
-
-            <ParticipantsList
-              userName={userName}
-              participants={room?.participants || []}
-              isAdmin={isAdmin}
-              onRemoveParticipant={handleRemoveParticipant}
-            />
           </div>
         </div>
       </div>
