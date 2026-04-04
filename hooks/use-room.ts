@@ -3,7 +3,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
 
-// Type definitions
 export interface Participant {
     id: string;
     name: string;
@@ -68,13 +67,12 @@ export function useRoom(
     const [error, setError] = useState<string | null>(null);
     const [wasRemoved, setWasRemoved] = useState(false);
 
-    // Usar ref para mantener la conexión SSE estable entre re-renders
     const eventSourceRef = useRef<EventSource | null>(null);
     const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const isMountedRef = useRef(true);
     const cleanupTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const participantIdRef = useRef<string | null>(null);
 
-    // Convert roomCode to string if it's an array
     const code = Array.isArray(roomCode) ? roomCode[0] : roomCode;
 
     useEffect(() => {
@@ -86,12 +84,10 @@ export function useRoom(
                     `planning-poker-participant-${code}`,
                 );
 
-                // Si no existe un ID específico para esta sala, intentar con el ID general
                 if (!storedParticipantId) {
                     storedParticipantId = localStorage.getItem("participantId");
                 }
 
-                // Obtener el rol guardado si existe
                 const storedRole =
                     localStorage.getItem(`planning-poker-role-${code}`) || "";
 
@@ -117,6 +113,7 @@ export function useRoom(
                 const data = await response.json();
                 setRoom(data.room);
                 setParticipantId(data.participantId);
+                participantIdRef.current = data.participantId;
 
                 localStorage.setItem("participantId", data.participantId);
                 localStorage.setItem(
@@ -136,19 +133,67 @@ export function useRoom(
         joinRoom();
     }, [code, userName]);
 
-    // Efecto para establecer conexión SSE - solo se ejecuta UNA VEZ por roomCode
+    useEffect(() => {
+        if (!code) return;
+
+        const isAdmin = typeof window !== "undefined"
+            ? localStorage.getItem("isAdmin") === "true"
+            : false;
+
+        let hasSentLeave = false;
+
+        const clearRoomSession = () => {
+            localStorage.removeItem(`planning-poker-participant-${code}`);
+            localStorage.removeItem(`planning-poker-role-${code}`);
+            localStorage.removeItem("participantId");
+        };
+
+        const sendLeaveBeacon = () => {
+            const pid = participantIdRef.current;
+            if (!pid || isAdmin || hasSentLeave) return;
+            hasSentLeave = true;
+
+            const url = `/api/rooms/${code}/participants/${pid}/delete`;
+            const payload = JSON.stringify({ adminId: pid });
+            const blob = new Blob([payload], { type: "application/json" });
+            navigator.sendBeacon(url, blob);
+            clearRoomSession();
+        };
+
+        const sendLeaveFetch = () => {
+            const pid = participantIdRef.current;
+            if (!pid || isAdmin || hasSentLeave) return;
+            hasSentLeave = true;
+
+            fetch(`/api/rooms/${code}/participants/${pid}/delete`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ adminId: pid }),
+                keepalive: true,
+            }).catch(() => {});
+            clearRoomSession();
+        };
+
+        window.addEventListener("beforeunload", sendLeaveBeacon);
+        window.addEventListener("pagehide", sendLeaveBeacon);
+
+        return () => {
+            window.removeEventListener("beforeunload", sendLeaveBeacon);
+            window.removeEventListener("pagehide", sendLeaveBeacon);
+            sendLeaveFetch();
+        };
+    }, [code]);
+
     useEffect(() => {
         if (!code) {
             return;
         }
 
-        // CANCELAR cualquier cleanup diferido pendiente ANTES de decidir saltar por conexión existente
         if (cleanupTimeoutRef.current) {
             clearTimeout(cleanupTimeoutRef.current);
             cleanupTimeoutRef.current = null;
         }
 
-        // Si ya hay una conexión activa para esta sala, no hacer nada
         if (eventSourceRef.current) {
             return;
         }
@@ -167,13 +212,10 @@ export function useRoom(
 
             isConnecting = true;
 
-            // Cerrar conexión anterior si existe
             if (eventSourceRef.current) {
                 try {
                     eventSourceRef.current.close();
-                } catch (e) {
-                    // Ignorar error
-                }
+                } catch (e) {}
             }
 
             eventSourceRef.current = new EventSource(
@@ -218,14 +260,12 @@ export function useRoom(
 
         connect();
 
-        // Cleanup SOLO cuando roomCode cambia (no en re-renders)
         return () => {
             if (cleanupTimeoutRef.current) {
                 clearTimeout(cleanupTimeoutRef.current);
                 cleanupTimeoutRef.current = null;
             }
 
-            // Programar cierre diferido para sobrevivir al doble-montaje de Strict Mode
             const currentEventSource = eventSourceRef.current;
             cleanupTimeoutRef.current = setTimeout(() => {
                 if (
@@ -247,7 +287,6 @@ export function useRoom(
         };
     }, [code]);
 
-    // Efecto para detectar si el participante fue eliminado
     useEffect(() => {
         if (!room || !participantId || isLoading) return;
 
@@ -259,8 +298,6 @@ export function useRoom(
             setWasRemoved(true);
         }
     }, [room, participantId, isLoading]);
-
-    // --- Mutations ---
 
     const submitVoteMutation = useMutation({
         mutationFn: async (vote: string) => {
@@ -400,8 +437,6 @@ export function useRoom(
             localStorage.removeItem(`planning-poker-role-${code}`);
         },
     });
-
-    // --- Public API (preserves original async function signatures) ---
 
     const submitVote = (vote: string) => submitVoteMutation.mutateAsync(vote).then(() => undefined);
     const revealVotes = () => revealVotesMutation.mutateAsync().then(() => undefined);

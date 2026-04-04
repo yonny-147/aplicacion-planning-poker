@@ -72,28 +72,31 @@ export default function RoomPage() {
   useEffect(() => {
     setMounted(true)
 
-    // Validar que exista userName, si no redirigir
     if (!userName) {
       router.push("/")
       return
     }
-  }, [router, userName])
 
-  // Efecto para detectar cuando el participante fue eliminado
+    const code = Array.isArray(roomCode) ? roomCode[0] : roomCode
+    const hasRoomSession = localStorage.getItem(`planning-poker-participant-${code}`)
+    if (!hasRoomSession) {
+      router.push(`/join/${code}`)
+      return
+    }
+  }, [router, userName, roomCode])
+
   useEffect(() => {
     if (wasRemoved) {
-      // Limpiar localStorage
       localStorage.removeItem("userName")
       localStorage.removeItem("isAdmin")
       localStorage.removeItem("participantId")
       localStorage.removeItem(`planning-poker-participant-${roomCode}`)
+      localStorage.removeItem(`planning-poker-role-${roomCode}`)
 
-      // Mostrar notificación
       toast.error("Eliminado de la sala", {
         description: "Has sido eliminado de la sala o la sala fue eliminada por el administrador.",
       })
 
-      // Redirigir a la página principal después de un breve momento
       setTimeout(() => {
         router.push("/")
       }, 1500)
